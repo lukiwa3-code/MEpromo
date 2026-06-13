@@ -2,9 +2,7 @@ import csv
 import json
 import os
 import time
-from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 import requests
 
@@ -416,6 +414,94 @@ def normalize_rows(apify_items):
     return rows
 
 
+def product_key(row):
+    for field in ("lego_code", "product_id", "offer_id", "url", "name"):
+        value = row.get(field)
+        if value not in (None, ""):
+            return f"{field}:{value}"
+    return ""
+
+
+def price_value(value):
+    if value in (None, ""):
+        return None
+    try:
+        return round(float(value), 2)
+    except (TypeError, ValueError):
+        return None
+
+
+def price_signature(row):
+    return (
+        price_value(row.get("price_gross")),
+        price_value(row.get("price_with_code")),
+    )
+
+
+def load_previous_latest():
+    if not LATEST_FILE.exists():
+        return {}
+
+    try:
+        previous_rows = json.loads(LATEST_FILE.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        print(f"Nie udało się odczytać poprzedniego latest_prices.json: {exc}")
+        return {}
+
+    if not isinstance(previous_rows, list):
+        return {}
+
+    result = {}
+    for row in previous_rows:
+        if isinstance(row, dict):
+            key = product_key(row)
+            if key:
+                result[key] = row
+    return result
+
+
+def enrich_tracking_dates(rows):
+    previous_by_key = load_previous_latest()
+    new_count = 0
+    changed_count = 0
+
+    for row in rows:
+        key = product_key(row)
+        previous = previous_by_key.get(key)
+        checked_at = row.get("checked_at") or ""
+
+        if previous:
+            row["first_seen_at"] = previous.get("first_seen_at") or previous.get("checked_at") or checked_at
+            old_signature = price_signature(previous)
+            new_signature = price_signature(row)
+
+            if old_signature != new_signature:
+                row["price_changed_at"] = checked_at
+                row["previous_price_gross"] = previous.get("price_gross")
+                row["previous_price_with_code"] = previous.get("price_with_code")
+                row["price_changed_now"] = True
+                changed_count += 1
+            else:
+                row["price_changed_at"] = previous.get("price_changed_at")
+                row["previous_price_gross"] = previous.get("previous_price_gross")
+                row["previous_price_with_code"] = previous.get("previous_price_with_code")
+                row["price_changed_now"] = False
+
+            row["is_new_product"] = False
+        else:
+            row["first_seen_at"] = checked_at
+            row["price_changed_at"] = None
+            row["previous_price_gross"] = None
+            row["previous_price_with_code"] = None
+            row["price_changed_now"] = False
+            row["is_new_product"] = True
+            new_count += 1
+
+    print(f"Nowe produkty w tym odświeżeniu: {new_count}")
+    print(f"Produkty ze zmianą ceny w tym odświeżeniu: {changed_count}")
+    return rows
+
+
 def save_latest(rows):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     LATEST_FILE.write_text(
@@ -424,24 +510,51 @@ def save_latest(rows):
     )
 
 
+def build_fieldnames(existing_fieldnames, rows):
+    fieldnames = []
+    for field in existing_fieldnames:
+        if field and field not in fieldnames:
+            fieldnames.append(field)
+
+    for row in rows:
+        for field in row.keys():
+            if field not in fieldnames:
+                fieldnames.append(field)
+
+    return fieldnames
+
+
 def append_history(rows):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
-    file_exists = HISTORY_FILE.exists()
+    existing_rows = []
+    existing_fieldnames = []
 
-    with HISTORY_FILE.open("a", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=list(rows[0].keys()))
+    if HISTORY_FILE.exists() and HISTORY_FILE.stat().st_size > 0:
+        with HISTORY_FILE.open("r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            existing_fieldnames = reader.fieldnames or []
+            existing_rows = list(reader)
 
-        if not file_exists:
+    fieldnames = build_fieldnames(existing_fieldnames, rows)
+
+    if not HISTORY_FILE.exists() or not existing_fieldnames or existing_fieldnames != fieldnames:
+        with HISTORY_FILE.open("w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
-
-        writer.writerows(rows)
+            writer.writerows(existing_rows)
+            writer.writerows(rows)
+    else:
+        with HISTORY_FILE.open("a", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames, extrasaction="ignore")
+            writer.writerows(rows)
 
 
 def main():
     print("Uruchamiam Apify Playwright Scraper...")
     apify_items = call_apify()
     rows = normalize_rows(apify_items)
+    rows = enrich_tracking_dates(rows)
 
     save_latest(rows)
     append_history(rows)
