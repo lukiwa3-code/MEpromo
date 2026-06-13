@@ -8,10 +8,8 @@ from zoneinfo import ZoneInfo
 import requests
 
 
-APIFY_ACTOR_URL = (
-    "https://api.apify.com/v2/acts/apify~playwright-scraper/"
-    "run-sync-get-dataset-items?format=json&clean=true&timeout=300"
-)
+ACTOR_ID = "apify~playwright-scraper"
+APIFY_BASE_URL = "https://api.apify.com/v2"
 
 LISTING_URL = "https://www.mediaexpert.pl/zabawki/lego/lego/promocje_cena-z-kodem?limit=50"
 DATA_DIR = Path("data")
@@ -22,8 +20,17 @@ HISTORY_FILE = DATA_DIR / "price_history.csv"
 PAGE_FUNCTION = r"""
 async function pageFunction(context) {
     const { page, request, response, log } = context;
+    await context.skipLinks();
 
     const checkedAt = new Date().toISOString();
+
+    function getStatus(responseObject) {
+        if (!responseObject) return null;
+        if (typeof responseObject.status === 'function') return responseObject.status();
+        if (responseObject.status !== undefined) return responseObject.status;
+        if (responseObject.statusCode !== undefined) return responseObject.statusCode;
+        return null;
+    }
 
     function groszeToPln(value) {
         if (value === undefined || value === null || value === '') return null;
@@ -125,11 +132,23 @@ async function pageFunction(context) {
         }, sparkUrl);
     }
 
-    await page.waitForLoadState('domcontentloaded', { timeout: 90000 }).catch(() => {});
-    await page.waitForTimeout(9000);
+    async function getBodyText() {
+        return await page.locator('body').innerText({ timeout: 15000 }).catch(() => '');
+    }
 
-    const status = response ? response.status() : null;
-    const bodyText = await page.locator('body').innerText({ timeout: 10000 }).catch(() => '');
+    async function waitForPossibleContent() {
+        await page.waitForLoadState('domcontentloaded', { timeout: 90000 }).catch(() => {});
+        await page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {});
+        await page.waitForTimeout(7000);
+    }
+
+    await waitForPossibleContent();
+
+    const status = getStatus(response);
+    const bodyText = await getBodyText();
+
+    log.info(`Media Expert status: ${status}`);
+    log.info(`Body preview: ${bodyText.slice(0, 250).replace(/\s+/g, ' ')}`);
 
     if (
         status === 403 ||
@@ -141,7 +160,7 @@ async function pageFunction(context) {
             status,
             count: 0,
             rows: [],
-            pageText: bodyText.slice(0, 1500),
+            pageText: bodyText.slice(0, 2000),
         };
     }
 
@@ -154,6 +173,8 @@ async function pageFunction(context) {
             .map((entry) => entry.name)
             .filter((url) => url.includes('/spark-state/'))
     ).catch(() => []);
+
+    log.info(`Spark-state resource count: ${resourceUrls.length}`);
 
     if (resourceUrls.length > 0) {
         sparkUrl = resourceUrls[resourceUrls.length - 1];
@@ -183,7 +204,7 @@ async function pageFunction(context) {
             status,
             count: 0,
             rows: [],
-            pageText: bodyText.slice(0, 1500),
+            pageText: bodyText.slice(0, 2000),
         };
     }
 
@@ -203,53 +224,121 @@ async function pageFunction(context) {
 """
 
 
-def build_actor_input():
-    return {
-        "startUrls": [{"url": LISTING_URL}],
-        "maxRequestsPerCrawl": 1,
-        "maxConcurrency": 1,
-        "pageFunction": PAGE_FUNCTION,
-        "proxyConfiguration": {
-            "useApifyProxy": True,
-        },
-        "browserLog": False,
-        "debugLog": True,
-        "navigationTimeoutSecs": 120,
-    }
-
-
-def call_apify():
+def get_apify_token():
     token = os.environ.get("APIFY_TOKEN", "").strip()
     if not token:
         raise RuntimeError(
             "Brakuje sekretu APIFY_TOKEN. Dodaj go w GitHub: "
             "Settings -> Secrets and variables -> Actions -> New repository secret."
         )
+    return token
 
-    headers = {
-        "Authorization": f"Bearer {token}",
+
+def auth_headers():
+    return {
+        "Authorization": f"Bearer {get_apify_token()}",
         "Content-Type": "application/json",
     }
 
+
+def build_proxy_configuration():
+    proxy = {"useApifyProxy": True}
+
+    groups_raw = os.environ.get("APIFY_PROXY_GROUPS", "").strip()
+    if groups_raw:
+        proxy["apifyProxyGroups"] = [group.strip() for group in groups_raw.split(",") if group.strip()]
+
+    return proxy
+
+
+def build_actor_input():
+    return {
+        "startUrls": [{"url": LISTING_URL}],
+        "maxRequestsPerCrawl": 1,
+        "maxConcurrency": 1,
+        "pageFunction": PAGE_FUNCTION,
+        "proxyConfiguration": build_proxy_configuration(),
+        "browserLog": False,
+        "debugLog": True,
+        "navigationTimeoutSecs": 120,
+        "requestHandlerTimeoutSecs": 180,
+        "useChrome": True,
+    }
+
+
+def start_actor_run():
+    url = f"{APIFY_BASE_URL}/acts/{ACTOR_ID}/run-sync?timeout=300"
+
     response = requests.post(
-        APIFY_ACTOR_URL,
-        headers=headers,
+        url,
+        headers=auth_headers(),
         json=build_actor_input(),
         timeout=380,
     )
 
     if response.status_code >= 400:
-        print(response.text[:4000])
+        print(response.text[:5000])
+        response.raise_for_status()
+
+    payload = response.json()
+    return payload.get("data", payload)
+
+
+def fetch_dataset_items(dataset_id):
+    url = f"{APIFY_BASE_URL}/datasets/{dataset_id}/items?format=json&clean=false"
+    response = requests.get(url, headers=auth_headers(), timeout=120)
+
+    if response.status_code >= 400:
+        print(response.text[:5000])
         response.raise_for_status()
 
     return response.json()
 
 
+def fetch_run_log(run_id):
+    url = f"{APIFY_BASE_URL}/logs/{run_id}"
+    response = requests.get(url, headers=auth_headers(), timeout=120)
+
+    if response.status_code >= 400:
+        return f"Nie udało się pobrać logu Apify. HTTP {response.status_code}: {response.text[:1000]}"
+
+    return response.text
+
+
+def call_apify():
+    run = start_actor_run()
+
+    print(f"Apify run ID: {run.get('id')}")
+    print(f"Apify status: {run.get('status')}")
+    print(f"Apify defaultDatasetId: {run.get('defaultDatasetId')}")
+
+    run_id = run.get("id")
+    dataset_id = run.get("defaultDatasetId")
+
+    if run_id:
+        log_text = fetch_run_log(run_id)
+        print("--- Apify log preview ---")
+        print(log_text[-5000:])
+        print("--- end Apify log preview ---")
+
+    if not dataset_id:
+        raise RuntimeError(f"Apify nie zwrócił defaultDatasetId. Run: {run}")
+
+    return fetch_dataset_items(dataset_id)
+
+
 def normalize_rows(apify_items):
     if not isinstance(apify_items, list) or not apify_items:
-        raise RuntimeError(f"Apify nie zwrócił wyników. Odpowiedź: {apify_items}")
+        raise RuntimeError(f"Apify nie zwrócił wyników w dataset. Odpowiedź: {apify_items}")
 
     first_item = apify_items[0]
+
+    if first_item.get("#error"):
+        raise RuntimeError(
+            "Apify pageFunction zakończył się błędem. Rekord błędu: "
+            + json.dumps(first_item, ensure_ascii=False)[:5000]
+        )
+
     rows = first_item.get("rows") or []
 
     print(f"Źródło Apify: {first_item.get('source')}")
@@ -262,7 +351,7 @@ def normalize_rows(apify_items):
     if not rows:
         page_text = first_item.get("pageText") or ""
         print("Pierwszy tekst strony z Apify:")
-        print(page_text[:1500])
+        print(page_text[:2000])
         raise RuntimeError(
             "Apify uruchomił scraper, ale nie pobrał produktów. "
             "Jeśli source=blocked, trzeba w Apify włączyć lepszy proxy/residential."
