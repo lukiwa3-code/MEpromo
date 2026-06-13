@@ -1,6 +1,9 @@
 name: Update Media Expert LEGO prices
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:
