@@ -2,40 +2,14 @@
 
 Automatyczny skrypt do sprawdzania cen zestawów LEGO z promocji Media Expert.
 
-## Co robi
+## Ważna poprawka
 
-1. Pobiera stronę promocji LEGO z kodem.
-2. Znajduje aktualny plik `/spark-state/...`.
-3. Pobiera dane produktów z JSON-a.
-4. Zapisuje aktualne ceny do `data/latest_prices.json`.
-5. Dopisuje historię cen do `data/price_history.csv`.
-6. GitHub Actions uruchamia skrypt co godzinę.
+GitHub Actions może dostawać `403 Forbidden` przy próbie wejścia na stronę listingu Media Expert. Dlatego skrypt startuje bezpośrednio od `spark-state`, który działał w trybie incognito.
 
-## Pliki
+Domyślny adres jest w `scraper.py`:
 
-- `scraper.py` - główny skrypt
-- `requirements.txt` - biblioteki Pythona
-- `.github/workflows/update_prices.yml` - automatyzacja GitHub Actions
-- `data/latest_prices.json` - najnowsze dane
-- `data/price_history.csv` - historia cen
-
-## Ręczne uruchomienie lokalnie
-
-```bash
-pip install -r requirements.txt
-python scraper.py
+```python
+DEFAULT_SPARK_STATE_URL = "https://www.mediaexpert.pl/spark-state/30272cb24e-96a041-f2b27e-7efc1b"
 ```
 
-## Ręczne uruchomienie na GitHubie
-
-Wejdź w:
-
-```text
-Actions -> Update Media Expert LEGO prices -> Run workflow
-```
-
-## Uwaga
-
-Skrypt nie używa Twoich ciasteczek ani danych logowania.
-HTML jest używany tylko do znalezienia linku `/spark-state/...`.
-Produkty i ceny są pobierane z JSON-a.
+Możesz go podmienić przez zmienną środowiskową `SPARK_STATE_URL` albo podać kilka adresów po przecinku w `SPARK_STATE_URLS`.
