@@ -28,6 +28,8 @@ jobs:
       - name: Run Apify scraper
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          APIFY_PROXY_GROUPS: ${{ vars.APIFY_PROXY_GROUPS }}
+          APIFY_PROXY_COUNTRY: ${{ vars.APIFY_PROXY_COUNTRY }}
         run: python run_apify.py
 
       - name: Commit updated data
