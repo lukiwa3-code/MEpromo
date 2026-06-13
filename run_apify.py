@@ -1,6 +1,7 @@
 import csv
 import json
 import os
+import time
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -19,9 +20,7 @@ HISTORY_FILE = DATA_DIR / "price_history.csv"
 
 PAGE_FUNCTION = r"""
 async function pageFunction(context) {
-    const { page, request, response, log } = context;
-    await context.skipLinks();
-
+    const { page, response, log } = context;
     const checkedAt = new Date().toISOString();
 
     function getStatus(responseObject) {
@@ -122,6 +121,10 @@ async function pageFunction(context) {
         });
     }
 
+    async function getBodyText() {
+        return await page.locator('body').innerText({ timeout: 15000 }).catch(() => '');
+    }
+
     async function fetchSparkState(sparkUrl) {
         return await page.evaluate(async (url) => {
             const response = await fetch(url, { credentials: 'include' });
@@ -132,23 +135,15 @@ async function pageFunction(context) {
         }, sparkUrl);
     }
 
-    async function getBodyText() {
-        return await page.locator('body').innerText({ timeout: 15000 }).catch(() => '');
-    }
-
-    async function waitForPossibleContent() {
-        await page.waitForLoadState('domcontentloaded', { timeout: 90000 }).catch(() => {});
-        await page.waitForLoadState('networkidle', { timeout: 20000 }).catch(() => {});
-        await page.waitForTimeout(7000);
-    }
-
-    await waitForPossibleContent();
+    await page.waitForLoadState('domcontentloaded', { timeout: 90000 }).catch(() => {});
+    await page.waitForLoadState('networkidle', { timeout: 25000 }).catch(() => {});
+    await page.waitForTimeout(10000);
 
     const status = getStatus(response);
     const bodyText = await getBodyText();
 
     log.info(`Media Expert status: ${status}`);
-    log.info(`Body preview: ${bodyText.slice(0, 250).replace(/\s+/g, ' ')}`);
+    log.info(`Body preview: ${bodyText.slice(0, 300).replace(/\s+/g, ' ')}`);
 
     if (
         status === 403 ||
@@ -160,7 +155,7 @@ async function pageFunction(context) {
             status,
             count: 0,
             rows: [],
-            pageText: bodyText.slice(0, 2000),
+            pageText: bodyText.slice(0, 2500),
         };
     }
 
@@ -181,7 +176,7 @@ async function pageFunction(context) {
         try {
             state = await fetchSparkState(sparkUrl);
         } catch (error) {
-            log.warning(`Nie udało się pobrać spark-state z performance: ${error.message}`);
+            log.info(`Nie udało się pobrać spark-state z performance: ${error.message}`);
         }
     }
 
@@ -193,7 +188,7 @@ async function pageFunction(context) {
             try {
                 state = await fetchSparkState(sparkUrl);
             } catch (error) {
-                log.warning(`Nie udało się pobrać spark-state z HTML: ${error.message}`);
+                log.info(`Nie udało się pobrać spark-state z HTML: ${error.message}`);
             }
         }
     }
@@ -204,7 +199,7 @@ async function pageFunction(context) {
             status,
             count: 0,
             rows: [],
-            pageText: bodyText.slice(0, 2000),
+            pageText: bodyText.slice(0, 2500),
         };
     }
 
@@ -248,6 +243,10 @@ def build_proxy_configuration():
     if groups_raw:
         proxy["apifyProxyGroups"] = [group.strip() for group in groups_raw.split(",") if group.strip()]
 
+    country_code = os.environ.get("APIFY_PROXY_COUNTRY", "").strip()
+    if country_code:
+        proxy["apifyProxyCountry"] = country_code
+
     return proxy
 
 
@@ -266,33 +265,81 @@ def build_actor_input():
     }
 
 
-def start_actor_run():
-    url = f"{APIFY_BASE_URL}/acts/{ACTOR_ID}/run-sync?timeout=300"
+def parse_apify_json_response(response, action_name):
+    text = response.text or ""
+    content_type = response.headers.get("content-type", "")
 
+    print(f"{action_name}: HTTP {response.status_code}, content-type: {content_type}")
+
+    if response.status_code >= 400:
+        print(text[:5000])
+        response.raise_for_status()
+
+    if not text.strip():
+        raise RuntimeError(
+            f"Apify zwrócił pustą odpowiedź przy akcji: {action_name}. "
+            f"HTTP {response.status_code}, headers: {dict(response.headers)}"
+        )
+
+    try:
+        return response.json()
+    except ValueError as exc:
+        raise RuntimeError(
+            f"Apify nie zwrócił JSON przy akcji: {action_name}. "
+            f"HTTP {response.status_code}, content-type: {content_type}, "
+            f"pierwsze 2000 znaków: {text[:2000]}"
+        ) from exc
+
+
+def apify_post_json(url, payload, action_name, timeout=120):
     response = requests.post(
         url,
         headers=auth_headers(),
-        json=build_actor_input(),
-        timeout=380,
+        json=payload,
+        timeout=timeout,
     )
+    return parse_apify_json_response(response, action_name)
 
-    if response.status_code >= 400:
-        print(response.text[:5000])
-        response.raise_for_status()
 
-    payload = response.json()
+def apify_get_json(url, action_name, timeout=120):
+    response = requests.get(url, headers=auth_headers(), timeout=timeout)
+    return parse_apify_json_response(response, action_name)
+
+
+def start_actor_run():
+    url = f"{APIFY_BASE_URL}/acts/{ACTOR_ID}/runs"
+    payload = apify_post_json(url, build_actor_input(), "start_actor_run", timeout=120)
     return payload.get("data", payload)
+
+
+def get_actor_run(run_id):
+    url = f"{APIFY_BASE_URL}/actor-runs/{run_id}"
+    payload = apify_get_json(url, "get_actor_run", timeout=120)
+    return payload.get("data", payload)
+
+
+def wait_for_actor_run(run_id, max_wait_seconds=600):
+    terminal_statuses = {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"}
+    start = time.time()
+
+    while True:
+        run = get_actor_run(run_id)
+        status = run.get("status")
+        print(f"Apify status: {status}")
+
+        if status in terminal_statuses:
+            return run
+
+        if time.time() - start > max_wait_seconds:
+            raise RuntimeError(f"Apify run nie zakończył się w czasie {max_wait_seconds}s. Run ID: {run_id}")
+
+        time.sleep(10)
 
 
 def fetch_dataset_items(dataset_id):
     url = f"{APIFY_BASE_URL}/datasets/{dataset_id}/items?format=json&clean=false"
-    response = requests.get(url, headers=auth_headers(), timeout=120)
-
-    if response.status_code >= 400:
-        print(response.text[:5000])
-        response.raise_for_status()
-
-    return response.json()
+    payload = apify_get_json(url, "fetch_dataset_items", timeout=120)
+    return payload
 
 
 def fetch_run_log(run_id):
@@ -306,23 +353,32 @@ def fetch_run_log(run_id):
 
 
 def call_apify():
+    print("Startuję Actor w Apify przez endpoint /runs...")
     run = start_actor_run()
 
-    print(f"Apify run ID: {run.get('id')}")
-    print(f"Apify status: {run.get('status')}")
-    print(f"Apify defaultDatasetId: {run.get('defaultDatasetId')}")
-
     run_id = run.get("id")
-    dataset_id = run.get("defaultDatasetId")
+    if not run_id:
+        raise RuntimeError(f"Apify nie zwrócił ID uruchomienia. Run: {run}")
 
-    if run_id:
-        log_text = fetch_run_log(run_id)
-        print("--- Apify log preview ---")
-        print(log_text[-5000:])
-        print("--- end Apify log preview ---")
+    print(f"Apify run ID: {run_id}")
+    print(f"Apify initial status: {run.get('status')}")
 
+    final_run = wait_for_actor_run(run_id)
+
+    print(f"Apify final status: {final_run.get('status')}")
+    print(f"Apify defaultDatasetId: {final_run.get('defaultDatasetId')}")
+
+    log_text = fetch_run_log(run_id)
+    print("--- Apify log preview ---")
+    print(log_text[-7000:])
+    print("--- end Apify log preview ---")
+
+    if final_run.get("status") != "SUCCEEDED":
+        raise RuntimeError(f"Apify run nie zakończył się sukcesem. Final run: {final_run}")
+
+    dataset_id = final_run.get("defaultDatasetId")
     if not dataset_id:
-        raise RuntimeError(f"Apify nie zwrócił defaultDatasetId. Run: {run}")
+        raise RuntimeError(f"Apify nie zwrócił defaultDatasetId. Run: {final_run}")
 
     return fetch_dataset_items(dataset_id)
 
@@ -351,10 +407,10 @@ def normalize_rows(apify_items):
     if not rows:
         page_text = first_item.get("pageText") or ""
         print("Pierwszy tekst strony z Apify:")
-        print(page_text[:2000])
+        print(page_text[:2500])
         raise RuntimeError(
             "Apify uruchomił scraper, ale nie pobrał produktów. "
-            "Jeśli source=blocked, trzeba w Apify włączyć lepszy proxy/residential."
+            "Jeśli source=blocked, trzeba w Apify włączyć lepszy proxy, np. residential."
         )
 
     return rows
