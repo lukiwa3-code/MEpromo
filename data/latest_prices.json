@@ -1,6 +1,6 @@
 [
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10300",
     "offer_id": 2141494005,
@@ -9,12 +9,12 @@
     "name": "LEGO 10300 Icons Wehikuł czasu z „Powrotu do przyszłości”",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-creator-wehikul-czasu-z-powrotu-do-przyszlosci-10300",
     "price_gross": 743.71,
-    "price_with_code": 629.0,
+    "price_with_code": 629,
     "promo_code": "R1106-140626",
     "promo_date_from": "2026-06-11T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 649.0,
-    "omnibus_price_app": 649.0,
+    "omnibus_price_web": 649,
+    "omnibus_price_app": 649,
     "availability": "Dostępny",
     "availability_type": "available",
     "available_in_store": true,
@@ -26,7 +26,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10318",
     "offer_id": 144169927,
@@ -35,15 +35,15 @@
     "name": "LEGO 10318 Icons Concorde",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-10318-icons-concorde",
     "price_gross": 766.02,
-    "price_with_code": 629.0,
+    "price_with_code": 629,
     "promo_code": "R1106-140626",
     "promo_date_from": "2026-06-11T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 649.0,
-    "omnibus_price_app": 649.0,
+    "omnibus_price_web": 649,
+    "omnibus_price_app": 649,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -52,7 +52,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10368",
     "offer_id": 2148336246,
@@ -78,7 +78,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "43032",
     "offer_id": 2153214667,
@@ -87,12 +87,12 @@
     "name": "LEGO 43032 Editions Football Oficjalne logo FIFA World Cup 2026",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-43032-editions-football-oficjalne-logo-fifa-world-cup-2026",
     "price_gross": 109.99,
-    "price_with_code": 89.0,
+    "price_with_code": 89,
     "promo_code": "R0906-170626",
     "promo_date_from": "2026-06-09T00:00:00+02:00",
     "promo_date_to": "2026-06-17T23:59:00+02:00",
-    "omnibus_price_web": 99.0,
-    "omnibus_price_app": 99.0,
+    "omnibus_price_web": 99,
+    "omnibus_price_app": 99,
     "availability": "Dostępny",
     "availability_type": "available",
     "available_in_store": true,
@@ -104,7 +104,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "77076",
     "offer_id": 2150359317,
@@ -113,7 +113,7 @@
     "name": "LEGO 77076 Fortnite Restauracja Durrr Burgerownia",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-77076-fortnite-restauracja-durrr-burgerownia",
     "price_gross": 139.99,
-    "price_with_code": 119.0,
+    "price_with_code": 119,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -130,7 +130,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10343",
     "offer_id": 2149214700,
@@ -156,7 +156,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "21376",
     "offer_id": 2152886764,
@@ -165,7 +165,7 @@
     "name": "LEGO IDEAS 21376 Rudy kot",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-ideas-21376-rudy-kot",
     "price_gross": 429.99,
-    "price_with_code": 369.0,
+    "price_with_code": 369,
     "promo_code": "MP1206-1806",
     "promo_date_from": "2026-06-12T00:00:00+02:00",
     "promo_date_to": "2026-06-18T23:59:00+02:00",
@@ -182,7 +182,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "71043",
     "offer_id": 924200635,
@@ -191,15 +191,15 @@
     "name": "LEGO 71043 Harry Potter Zamek Hogwart",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-harry-potter-zamek-hogwart-71043",
     "price_gross": 1599.9,
-    "price_with_code": 1439.0,
+    "price_with_code": 1439,
     "promo_code": "R1106-140626",
     "promo_date_from": "2026-06-11T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 1449.0,
-    "omnibus_price_app": 1449.0,
+    "omnibus_price_web": 1449,
+    "omnibus_price_app": 1449,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -208,7 +208,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10374",
     "offer_id": 2151885001,
@@ -234,7 +234,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10328",
     "offer_id": 2146800714,
@@ -260,7 +260,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "11504",
     "offer_id": 2151885169,
@@ -286,7 +286,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "11501",
     "offer_id": 2151885167,
@@ -312,7 +312,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "11502",
     "offer_id": 2152611228,
@@ -338,7 +338,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10369",
     "offer_id": 2148336278,
@@ -364,7 +364,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "11509",
     "offer_id": 2151885183,
@@ -377,8 +377,8 @@
     "promo_code": "R1106-170626",
     "promo_date_from": "2026-06-11T00:00:00+02:00",
     "promo_date_to": "2026-06-17T23:59:00+02:00",
-    "omnibus_price_web": 79.0,
-    "omnibus_price_app": 79.0,
+    "omnibus_price_web": 79,
+    "omnibus_price_app": 79,
     "availability": "Dostępny",
     "availability_type": "available",
     "available_in_store": true,
@@ -390,7 +390,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10280",
     "offer_id": 800946197,
@@ -399,7 +399,7 @@
     "name": "LEGO 10280 Botanicals Bukiet kwiatów",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-10280-icons-bukiet-kwiatow",
     "price_gross": 177.99,
-    "price_with_code": 149.0,
+    "price_with_code": 149,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -416,7 +416,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10311",
     "offer_id": 1938707820,
@@ -442,7 +442,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10281",
     "offer_id": 800945955,
@@ -468,7 +468,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "42205",
     "offer_id": 2149519072,
@@ -477,12 +477,12 @@
     "name": "LEGO 42205 Technic Chevrolet Corvette Stingray",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-42205-technic-chevrolet-corvette-stingray",
     "price_gross": 189.9,
-    "price_with_code": 139.0,
+    "price_with_code": 139,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 149.0,
-    "omnibus_price_app": 149.0,
+    "omnibus_price_web": 149,
+    "omnibus_price_app": 149,
     "availability": "Dostępny",
     "availability_type": "available",
     "available_in_store": true,
@@ -494,7 +494,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10459",
     "offer_id": 2151392105,
@@ -503,12 +503,12 @@
     "name": "LEGO 10459 DUPLO Bluey Dom rodzinny Blue z grą pamięciową",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-10459-duplo-dom-rodzinny-blue-z-gra-pamieciowa",
     "price_gross": 210.33,
-    "price_with_code": 139.0,
+    "price_with_code": 139,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 149.0,
-    "omnibus_price_app": 149.0,
+    "omnibus_price_web": 149,
+    "omnibus_price_app": 149,
     "availability": "Dostępny",
     "availability_type": "available",
     "available_in_store": true,
@@ -520,7 +520,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10349",
     "offer_id": 2150358825,
@@ -546,7 +546,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10348",
     "offer_id": 2150358817,
@@ -572,7 +572,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "40725",
     "offer_id": 147084601,
@@ -598,7 +598,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10329",
     "offer_id": 108301200,
@@ -624,7 +624,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10313",
     "offer_id": 2145527550,
@@ -650,7 +650,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10342",
     "offer_id": 2149214678,
@@ -676,7 +676,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10344",
     "offer_id": 2149214674,
@@ -702,7 +702,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "40460",
     "offer_id": 91717843,
@@ -728,7 +728,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10347",
     "offer_id": 2150185243,
@@ -754,7 +754,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "40524",
     "offer_id": 2146800528,
@@ -780,7 +780,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "72032",
     "offer_id": 2149214144,
@@ -789,7 +789,7 @@
     "name": "LEGO 72032 Super Mario Mario Kart - Standard Kart",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-72032-super-mario-mario-kart-standard-kart",
     "price_gross": 56.99,
-    "price_with_code": 49.0,
+    "price_with_code": 49,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -806,7 +806,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "11510",
     "offer_id": 2152611238,
@@ -832,7 +832,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "40647",
     "offer_id": 145645824,
@@ -858,7 +858,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "77985",
     "offer_id": 2154335863,
@@ -884,33 +884,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
-    "shop": "Media Expert",
-    "lego_code": "10354",
-    "offer_id": 2150358829,
-    "product_id": 7743819,
-    "product_parent_id": 7743817,
-    "name": "LEGO 10354 Icons Władca pierścieni: Shire",
-    "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-10354-icons-wladca-pierscieni-shire",
-    "price_gross": 1149.99,
-    "price_with_code": 829.0,
-    "promo_code": "R1106-140626",
-    "promo_date_from": "2026-06-11T00:00:00+02:00",
-    "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 849.0,
-    "omnibus_price_app": 849.0,
-    "availability": "Dostępny",
-    "availability_type": "available",
-    "available_in_store": null,
-    "first_seen_at": "2026-06-13T19:59:49+02:00",
-    "price_changed_at": null,
-    "previous_price_gross": null,
-    "previous_price_with_code": null,
-    "price_changed_now": false,
-    "is_new_product": false
-  },
-  {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "42231",
     "offer_id": 2154335461,
@@ -923,11 +897,11 @@
     "promo_code": null,
     "promo_date_from": null,
     "promo_date_to": null,
-    "omnibus_price_web": 499.0,
-    "omnibus_price_app": 499.0,
+    "omnibus_price_web": 499,
+    "omnibus_price_app": 499,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -936,7 +910,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "42172",
     "offer_id": 2148403434,
@@ -945,7 +919,7 @@
     "name": "LEGO 42172 Technic McLaren P1",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-42172-technic-mclaren-p1",
     "price_gross": 1367.74,
-    "price_with_code": 1299.0,
+    "price_with_code": 1299,
     "promo_code": "R1106-140626",
     "promo_date_from": "2026-06-11T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -962,7 +936,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "76470",
     "offer_id": 2151884275,
@@ -971,12 +945,12 @@
     "name": "LEGO 76470 Harry Potter Zaczarowany Latający Ford Anglia",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-76470-harry-potter-zaczarowany-latajacy-ford-anglia",
     "price_gross": 237.6,
-    "price_with_code": 199.0,
+    "price_with_code": 199,
     "promo_code": "R0906-140626",
     "promo_date_from": "2026-06-09T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 219.0,
-    "omnibus_price_app": 219.0,
+    "omnibus_price_web": 219,
+    "omnibus_price_app": 219,
     "availability": "Dostępny",
     "availability_type": "available",
     "available_in_store": true,
@@ -988,7 +962,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "77081",
     "offer_id": 2154335795,
@@ -997,7 +971,7 @@
     "name": "LEGO 77081 Fortnite Kitek",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-77081-fortnite-kitek",
     "price_gross": 419.99,
-    "price_with_code": 299.0,
+    "price_with_code": 299,
     "promo_code": "MP1206-1806",
     "promo_date_from": "2026-06-12T00:00:00+02:00",
     "promo_date_to": "2026-06-18T23:59:00+02:00",
@@ -1014,7 +988,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "76462",
     "offer_id": 2154335771,
@@ -1023,7 +997,7 @@
     "name": "LEGO 76462 Harry Potter Herb Hogwartu",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-76462-harry-potter-herb-hogwartu",
     "price_gross": 209.99,
-    "price_with_code": 149.0,
+    "price_with_code": 149,
     "promo_code": "MP1206-1806",
     "promo_date_from": "2026-06-12T00:00:00+02:00",
     "promo_date_to": "2026-06-18T23:59:00+02:00",
@@ -1040,7 +1014,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "21597",
     "offer_id": 2154335501,
@@ -1049,7 +1023,7 @@
     "name": "LEGO 21597 Minecraft Stacja Ghasta",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-21597-minecraft-stacja-ghasta",
     "price_gross": 419.99,
-    "price_with_code": 299.0,
+    "price_with_code": 299,
     "promo_code": "MP1206-1806",
     "promo_date_from": "2026-06-12T00:00:00+02:00",
     "promo_date_to": "2026-06-18T23:59:00+02:00",
@@ -1057,7 +1031,7 @@
     "omnibus_price_app": 309.99,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -1066,7 +1040,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "75409",
     "offer_id": 2151392247,
@@ -1075,15 +1049,15 @@
     "name": "LEGO 75409 Star Wars Patrolowiec typu Firespray Jango Fetta",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-75409-star-wars-patrolowiec-typu-firespray-jango-fetta",
     "price_gross": 1299.99,
-    "price_with_code": 999.0,
+    "price_with_code": 999,
     "promo_code": "R1206-210626",
     "promo_date_from": "2026-06-12T00:00:00+02:00",
     "promo_date_to": "2026-06-21T23:59:00+02:00",
-    "omnibus_price_web": 1075.0,
-    "omnibus_price_app": 1075.0,
+    "omnibus_price_web": 1075,
+    "omnibus_price_app": 1075,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -1092,7 +1066,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "21063",
     "offer_id": 2151392139,
@@ -1101,7 +1075,7 @@
     "name": "LEGO 21063 Architecture Zamek Neuschwanstein",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-21063-architecture-zamek-neuschwanstein",
     "price_gross": 879.9,
-    "price_with_code": 799.0,
+    "price_with_code": 799,
     "promo_code": "R1106-140626",
     "promo_date_from": "2026-06-11T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -1109,7 +1083,7 @@
     "omnibus_price_app": 808.96,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -1118,7 +1092,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "76210",
     "offer_id": 2142968700,
@@ -1127,7 +1101,7 @@
     "name": "LEGO 76210 Marvel Hulkbuster",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-marvel-hulkbuster-76210",
     "price_gross": 2999.99,
-    "price_with_code": 2699.0,
+    "price_with_code": 2699,
     "promo_code": "ME1206-210626",
     "promo_date_from": "2026-06-12T00:00:00+02:00",
     "promo_date_to": "2026-06-21T23:59:00+02:00",
@@ -1135,7 +1109,7 @@
     "omnibus_price_app": 2999.99,
     "availability": "Dostępny",
     "availability_type": "available",
-    "available_in_store": null,
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
@@ -1144,7 +1118,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "76307",
     "offer_id": 2149214262,
@@ -1153,12 +1127,12 @@
     "name": "LEGO 76307 Marvel Mech Iron Mana kontra Ultron",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-76307-marvel-mech-iron-mana-kontra-ultron",
     "price_gross": 64.99,
-    "price_with_code": 35.0,
+    "price_with_code": 35,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 39.0,
-    "omnibus_price_app": 39.0,
+    "omnibus_price_web": 39,
+    "omnibus_price_app": 39,
     "availability": "Produkt tylko w sklepie",
     "availability_type": "shops_only",
     "available_in_store": true,
@@ -1170,7 +1144,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "76302",
     "offer_id": 2149214184,
@@ -1179,12 +1153,12 @@
     "name": "LEGO 76302 DC Mech Supermana kontra Lex Luthor",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-76302-marvel-mech-spider-mana-kontra-lex-luthor",
     "price_gross": 64.99,
-    "price_with_code": 35.0,
+    "price_with_code": 35,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 39.0,
-    "omnibus_price_app": 39.0,
+    "omnibus_price_web": 39,
+    "omnibus_price_app": 39,
     "availability": "Produkt tylko w sklepie",
     "availability_type": "shops_only",
     "available_in_store": true,
@@ -1196,7 +1170,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "75683",
     "offer_id": 2148530836,
@@ -1205,7 +1179,7 @@
     "name": "LEGO 75683 Wicked Akademik Glindy i Elphaby",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-75683-wicked-akademik-glindy-i-elphaby",
     "price_gross": 309.99,
-    "price_with_code": 139.0,
+    "price_with_code": 139,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -1222,7 +1196,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "72038",
     "offer_id": 2151392213,
@@ -1231,7 +1205,7 @@
     "name": "LEGO 72038 Super Mario Mario Kart - Wario i King Boo",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-72038-super-mario-mario-kart-wario-i-king-boo",
     "price_gross": 219.99,
-    "price_with_code": 89.0,
+    "price_with_code": 89,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
@@ -1248,7 +1222,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "71492",
     "offer_id": 2150359185,
@@ -1257,12 +1231,12 @@
     "name": "LEGO 71492 DREAMZzz Ognisty kameleon Mateo",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-71492-dreamzzz-ognisty-kameleon-mateo",
     "price_gross": 219.99,
-    "price_with_code": 119.0,
+    "price_with_code": 119,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 139.0,
-    "omnibus_price_app": 139.0,
+    "omnibus_price_web": 139,
+    "omnibus_price_app": 139,
     "availability": "Produkt tylko w sklepie",
     "availability_type": "shops_only",
     "available_in_store": true,
@@ -1274,7 +1248,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-13T19:59:49+02:00",
+    "checked_at": "2026-06-13T22:33:09.941Z",
     "shop": "Media Expert",
     "lego_code": "10450",
     "offer_id": 2150358857,
@@ -1283,15 +1257,41 @@
     "name": "LEGO 10450 DUPLO Gra Zamek Hopsy",
     "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-10450-duplo-gra-zamek-hopsy",
     "price_gross": 119.57,
-    "price_with_code": 89.0,
+    "price_with_code": 89,
     "promo_code": "R0306-140626",
     "promo_date_from": "2026-06-03T00:00:00+02:00",
     "promo_date_to": "2026-06-14T23:59:00+02:00",
-    "omnibus_price_web": 99.0,
-    "omnibus_price_app": 99.0,
+    "omnibus_price_web": 99,
+    "omnibus_price_app": 99,
     "availability": "Niedostępny",
     "availability_type": "not_available",
-    "available_in_store": null,
+    "available_in_store": false,
+    "first_seen_at": "2026-06-13T19:59:49+02:00",
+    "price_changed_at": null,
+    "previous_price_gross": null,
+    "previous_price_with_code": null,
+    "price_changed_now": false,
+    "is_new_product": false
+  },
+  {
+    "checked_at": "2026-06-13T22:33:09.941Z",
+    "shop": "Media Expert",
+    "lego_code": "10354",
+    "offer_id": 2150358829,
+    "product_id": 7743819,
+    "product_parent_id": 7743817,
+    "name": "LEGO 10354 Icons Władca pierścieni: Shire",
+    "url": "https://www.mediaexpert.pl/zabawki/lego/lego/lego-10354-icons-wladca-pierscieni-shire",
+    "price_gross": 1149.99,
+    "price_with_code": 829,
+    "promo_code": "R1106-140626",
+    "promo_date_from": "2026-06-11T00:00:00+02:00",
+    "promo_date_to": "2026-06-14T23:59:00+02:00",
+    "omnibus_price_web": 849,
+    "omnibus_price_app": 849,
+    "availability": "Niedostępny",
+    "availability_type": "not_available",
+    "available_in_store": false,
     "first_seen_at": "2026-06-13T19:59:49+02:00",
     "price_changed_at": null,
     "previous_price_gross": null,
