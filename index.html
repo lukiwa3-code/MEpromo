@@ -16,6 +16,7 @@
       --good: #22c55e;
       --bad: #ef4444;
       --blue: #38bdf8;
+      --violet: #a78bfa;
     }
 
     * { box-sizing: border-box; }
@@ -29,7 +30,7 @@
 
     header {
       padding: 28px 18px 18px;
-      max-width: 1250px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -46,14 +47,14 @@
     }
 
     .dashboard {
-      max-width: 1250px;
+      max-width: 1400px;
       margin: 0 auto;
       padding: 0 18px 30px;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
       gap: 12px;
       margin-bottom: 16px;
     }
@@ -110,7 +111,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 1080px;
+      min-width: 1380px;
     }
 
     th, td {
@@ -133,6 +134,8 @@
     }
 
     tbody tr:hover { background: rgba(250, 204, 21, .07); }
+    tbody tr.new-product { background: rgba(34, 197, 94, .07); }
+    tbody tr.changed-price { background: rgba(167, 139, 250, .08); }
 
     .name {
       font-weight: 700;
@@ -147,6 +150,7 @@
       border: 1px solid rgba(250, 204, 21, .35);
       border-radius: 999px;
       font-weight: 700;
+      white-space: nowrap;
     }
 
     .price { font-weight: 800; white-space: nowrap; }
@@ -162,6 +166,33 @@
     .discount-bad {
       color: var(--muted);
       white-space: nowrap;
+    }
+
+    .date-cell {
+      white-space: nowrap;
+      color: #cbd5e1;
+    }
+
+    .changed-badge, .new-badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .changed-badge {
+      color: #ddd6fe;
+      border: 1px solid rgba(167, 139, 250, .55);
+      background: rgba(167, 139, 250, .16);
+    }
+
+    .new-badge {
+      color: #bbf7d0;
+      border: 1px solid rgba(34, 197, 94, .55);
+      background: rgba(34, 197, 94, .14);
     }
 
     a {
@@ -188,7 +219,7 @@
       display: none;
     }
 
-    @media (max-width: 850px) {
+    @media (max-width: 1050px) {
       .stats { grid-template-columns: repeat(2, 1fr); }
       .controls { grid-template-columns: 1fr; }
     }
@@ -197,7 +228,7 @@
 <body>
   <header>
     <h1>LEGO Promo Tracker</h1>
-    <p class="subtitle">Ceny z Media Expert z pliku <strong>data/latest_prices.json</strong>. Tabelka sama odświeża dane po każdym uruchomieniu GitHub Actions.</p>
+    <p class="subtitle">Ceny z Media Expert z pliku <strong>data/latest_prices.json</strong>. Teraz tabela pamięta pierwsze pojawienie się zestawu i datę ostatniej zmiany ceny.</p>
   </header>
 
   <main class="dashboard">
@@ -217,6 +248,10 @@
         <div id="statBest" class="value">-</div>
       </div>
       <div class="stat">
+        <div class="label">Zmiany cen teraz</div>
+        <div id="statChanged" class="value">-</div>
+      </div>
+      <div class="stat">
         <div class="label">Ostatnia aktualizacja</div>
         <div id="statDate" class="value" style="font-size:17px">-</div>
       </div>
@@ -228,11 +263,16 @@
         <option value="all">Wszystkie produkty</option>
         <option value="promo">Tylko z ceną z kodem</option>
         <option value="noPromo">Bez ceny z kodem</option>
+        <option value="changed">Tylko ze zmianą ceny</option>
+        <option value="new">Tylko nowe produkty</option>
       </select>
       <select id="sortSelect">
         <option value="discount_desc">Największa obniżka</option>
         <option value="price_asc">Cena rosnąco</option>
         <option value="price_desc">Cena malejąco</option>
+        <option value="change_desc">Ostatnia zmiana ceny</option>
+        <option value="first_seen_desc">Najnowsze produkty</option>
+        <option value="first_seen_asc">Najstarsze produkty</option>
         <option value="code_asc">Kod LEGO A-Z</option>
         <option value="name_asc">Nazwa A-Z</option>
       </select>
@@ -247,6 +287,8 @@
             <th data-sort="price_gross">Cena</th>
             <th data-sort="price_with_code">Cena z kodem</th>
             <th data-sort="discount_value">Różnica</th>
+            <th data-sort="first_seen_at">Pierwsze pojawienie</th>
+            <th data-sort="price_changed_at">Ostatnia zmiana ceny</th>
             <th>Kod rabatowy</th>
             <th>Dostępność</th>
             <th>Omnibus</th>
@@ -257,7 +299,7 @@
       </table>
     </section>
 
-    <p class="footer-note">Kliknij nagłówek kolumny, żeby sortować. Dane pochodzą z ostatniego pliku wygenerowanego przez scraper.</p>
+    <p class="footer-note">Pierwsze pojawienie jest zapamiętywane od momentu, gdy tracker pierwszy raz zobaczył zestaw. Ostatnia zmiana ceny uzupełnia się tylko wtedy, gdy zmieni się cena lub cena z kodem.</p>
   </main>
 
   <script>
@@ -270,6 +312,26 @@
     };
 
     const safe = value => String(value ?? "");
+
+    const formatDate = value => {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return safe(value).replace("T", " ");
+      return date.toLocaleString("pl-PL", {
+        timeZone: "Europe/Warsaw",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    };
+
+    const dateNumber = value => {
+      if (!value) return 0;
+      const time = new Date(value).getTime();
+      return Number.isNaN(time) ? 0 : time;
+    };
 
     const calcDiscount = item => {
       const normal = Number(item.price_gross || 0);
@@ -301,6 +363,7 @@
 
     function updateStats() {
       const promoCount = products.filter(p => p.price_with_code).length;
+      const changedCount = products.filter(p => p.price_changed_now).length;
       const best = products
         .map(p => calcDiscount(p))
         .filter(v => v !== null && v > 0)
@@ -310,7 +373,8 @@
       document.getElementById("statCount").textContent = products.length;
       document.getElementById("statPromo").textContent = promoCount;
       document.getElementById("statBest").textContent = best ? money(best) : "-";
-      document.getElementById("statDate").textContent = lastDate.replace("T", " ");
+      document.getElementById("statChanged").textContent = changedCount;
+      document.getElementById("statDate").textContent = formatDate(lastDate);
     }
 
     function getFilteredProducts() {
@@ -329,7 +393,9 @@
         const matchesPromo =
           promoFilter === "all" ||
           (promoFilter === "promo" && hasPromo) ||
-          (promoFilter === "noPromo" && !hasPromo);
+          (promoFilter === "noPromo" && !hasPromo) ||
+          (promoFilter === "changed" && !!item.price_changed_now) ||
+          (promoFilter === "new" && !!item.is_new_product);
 
         return matchesSearch && matchesPromo;
       });
@@ -347,6 +413,9 @@
           case "code_asc": return safe(a.lego_code).localeCompare(safe(b.lego_code), "pl");
           case "name_asc": return safe(a.name).localeCompare(safe(b.name), "pl");
           case "discount_asc": return Number(a.discount_value || 0) - Number(b.discount_value || 0);
+          case "change_desc": return dateNumber(b.price_changed_at) - dateNumber(a.price_changed_at);
+          case "first_seen_asc": return dateNumber(a.first_seen_at) - dateNumber(b.first_seen_at);
+          case "first_seen_desc": return dateNumber(b.first_seen_at) - dateNumber(a.first_seen_at);
           case "discount_desc":
           default: return Number(b.discount_value || 0) - Number(a.discount_value || 0);
         }
@@ -382,13 +451,19 @@
           ? `<a href="${item.url}" target="_blank" rel="noopener">Otwórz</a>`
           : "-";
 
+        const newBadge = item.is_new_product ? `<div class="new-badge">NOWY</div>` : "";
+        const changeBadge = item.price_changed_now ? `<div class="changed-badge">ZMIANA</div>` : "";
+        const rowClass = item.price_changed_now ? "changed-price" : (item.is_new_product ? "new-product" : "");
+
         return `
-          <tr>
+          <tr class="${rowClass}">
             <td>${legoCode}</td>
-            <td class="name">${safe(item.name)}</td>
+            <td class="name">${safe(item.name)}${newBadge}</td>
             <td><span class="price">${money(item.price_gross)}</span></td>
             <td>${promoPrice}</td>
             <td>${discountText}</td>
+            <td class="date-cell">${formatDate(item.first_seen_at)}</td>
+            <td class="date-cell">${formatDate(item.price_changed_at)}${changeBadge}</td>
             <td>${promoCode}</td>
             <td>${safe(item.availability) || "-"}</td>
             <td>${money(item.omnibus_price_web)}</td>
@@ -413,6 +488,9 @@
         else if (key === "lego_code") currentSort = "code_asc";
         else if (key === "name") currentSort = "name_asc";
         else if (key === "price_with_code") currentSort = "discount_desc";
+        else if (key === "first_seen_at") currentSort = currentSort === "first_seen_desc" ? "first_seen_asc" : "first_seen_desc";
+        else if (key === "price_changed_at") currentSort = "change_desc";
+        document.getElementById("sortSelect").value = currentSort;
         renderTable();
       });
     });
