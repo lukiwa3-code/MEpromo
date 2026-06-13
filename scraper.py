@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -11,14 +12,23 @@ import requests
 BASE_URL = "https://www.mediaexpert.pl"
 LISTING_URL = "https://www.mediaexpert.pl/zabawki/lego/lego/promocje_cena-z-kodem?limit=50"
 
+# GitHub Actions dostaje 403 na stronie listingu, więc startujemy od znanego JSON-a spark-state.
+# Możesz podmienić przez zmienną środowiskową SPARK_STATE_URL albo podać kilka URL-i w SPARK_STATE_URLS.
+DEFAULT_SPARK_STATE_URL = "https://www.mediaexpert.pl/spark-state/30272cb24e-96a041-f2b27e-7efc1b"
+
 DATA_DIR = Path("data")
 LATEST_FILE = DATA_DIR / "latest_prices.json"
 HISTORY_FILE = DATA_DIR / "price_history.csv"
 
 HEADERS = {
     "accept": "*/*",
-    "user-agent": "Mozilla/5.0",
+    "accept-language": "pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7",
     "referer": LISTING_URL,
+    "user-agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    ),
 }
 
 
@@ -45,15 +55,25 @@ def get_nested(data, *keys):
     return current
 
 
-def find_spark_state_url(page_url):
-    """
-    Pobiera stronę listingu i znajduje aktualny link /spark-state/...
-    Nie pobieramy cen z HTML. HTML służy tylko jako bramka do JSON-a.
-    """
-    response = requests.get(page_url, headers=HEADERS, timeout=30)
+def request_json(url):
+    response = requests.get(url, headers=HEADERS, timeout=30)
     response.raise_for_status()
+    return response.json()
 
-    html = response.text
+
+def request_text(url):
+    response = requests.get(url, headers=HEADERS, timeout=30)
+    response.raise_for_status()
+    return response.text
+
+
+def find_spark_state_url_from_listing(page_url):
+    """
+    Awaryjnie: próbuje znaleźć aktualny /spark-state/... na stronie listingu.
+    Na GitHub Actions Media Expert może zwracać 403, dlatego to NIE jest główna metoda.
+    """
+    html = request_text(page_url)
+
     match = re.search(r"/spark-state/[a-zA-Z0-9\-]+", html)
 
     if not match:
@@ -62,13 +82,55 @@ def find_spark_state_url(page_url):
     return BASE_URL + match.group(0)
 
 
-def fetch_spark_state(page_url):
-    spark_url = find_spark_state_url(page_url)
+def get_configured_spark_urls():
+    """
+    Priorytet:
+    1. SPARK_STATE_URLS - kilka adresów po przecinku, np. page1,page2
+    2. SPARK_STATE_URL - jeden adres
+    3. DEFAULT_SPARK_STATE_URL - adres z Twojego cURL-a
+    """
+    urls_many = os.environ.get("SPARK_STATE_URLS", "").strip()
+    if urls_many:
+        return [url.strip() for url in urls_many.split(",") if url.strip()]
 
-    response = requests.get(spark_url, headers=HEADERS, timeout=30)
-    response.raise_for_status()
+    url_one = os.environ.get("SPARK_STATE_URL", "").strip()
+    if url_one:
+        return [url_one]
 
-    return response.json(), spark_url
+    return [DEFAULT_SPARK_STATE_URL]
+
+
+def fetch_spark_state_direct(spark_url):
+    return request_json(spark_url), spark_url
+
+
+def fetch_spark_state_with_fallback(page_url):
+    """
+    Najpierw próbuje znany /spark-state/...,
+    a dopiero gdy to nie działa, próbuje znaleźć nowy link na stronie listingu.
+    """
+    configured_urls = get_configured_spark_urls()
+
+    last_error = None
+
+    for spark_url in configured_urls:
+        try:
+            return fetch_spark_state_direct(spark_url)
+        except Exception as exc:
+            last_error = exc
+            print(f"Nie udało się pobrać skonfigurowanego spark-state: {spark_url}")
+            print(f"Błąd: {exc}")
+
+    print("Próbuję znaleźć spark-state przez stronę listingu...")
+    try:
+        found_url = find_spark_state_url_from_listing(page_url)
+        return fetch_spark_state_direct(found_url)
+    except Exception as exc:
+        raise RuntimeError(
+            "Nie udało się pobrać spark-state ani przez bezpośredni URL, "
+            "ani przez stronę listingu. "
+            f"Ostatni błąd direct: {last_error}. Błąd listing: {exc}"
+        ) from exc
 
 
 def extract_lego_code_from_name(name):
@@ -106,6 +168,9 @@ def extract_code_map(state):
             offers = variant.get("offers") or {}
 
             for lego_code, product_data in offers.items():
+                if not isinstance(product_data, dict):
+                    continue
+
                 product_id = product_data.get("product_id")
 
                 if product_id:
@@ -114,18 +179,52 @@ def extract_code_map(state):
     return result
 
 
+def get_product_state(state):
+    return state.get("Service:GenericProductListService.state", {})
+
+
+def extract_promo_web(offer):
+    """
+    Media Expert raz używa snake_case (_for_action_price, code_price),
+    a w GraphQL czasem camelCase (ForActionPrice, codePrice).
+    Ten scraper obsługuje oba warianty.
+    """
+    sales_channel = offer.get("promotionPricesSalesChannel") or {}
+
+    web = sales_channel.get("web") or {}
+
+    promo = (
+        web.get("_for_action_price")
+        or web.get("ForActionPrice")
+        or web.get("forActionPrice")
+        or {}
+    )
+
+    if not isinstance(promo, dict):
+        return {}
+
+    return promo
+
+
+def get_promo_code_price_amount(promo):
+    code_price = promo.get("code_price") or promo.get("codePrice") or {}
+
+    if isinstance(code_price, dict):
+        return code_price.get("amount")
+
+    return None
+
+
+def get_promo_value(promo, snake_name, camel_name):
+    return promo.get(snake_name) or promo.get(camel_name)
+
+
 def extract_offer(offer, checked_at, code_map):
-    product_id = offer.get("product_id")
+    product_id = offer.get("product_id") or offer.get("productId")
     product_id_str = str(product_id) if product_id is not None else ""
 
-    promo_web = get_nested(
-        offer,
-        "promotionPricesSalesChannel",
-        "web",
-        "_for_action_price",
-    ) or {}
-
-    code_price = get_nested(promo_web, "code_price", "amount")
+    promo_web = extract_promo_web(offer)
+    code_price = get_promo_code_price_amount(promo_web)
 
     name = offer.get("name")
     lego_code = code_map.get(product_id_str) or extract_lego_code_from_name(name)
@@ -133,30 +232,32 @@ def extract_offer(offer, checked_at, code_map):
     link = offer.get("link") or ""
     full_url = BASE_URL + link if link.startswith("/") else link
 
+    availability = offer.get("availability") or {}
+
     return {
         "checked_at": checked_at,
         "shop": "Media Expert",
         "lego_code": lego_code,
         "offer_id": offer.get("id"),
         "product_id": product_id,
-        "product_parent_id": offer.get("product_parent_id"),
+        "product_parent_id": offer.get("product_parent_id") or offer.get("productParentId"),
         "name": name,
         "url": full_url,
-        "price_gross": grosze_to_pln(offer.get("price_gross")),
+        "price_gross": grosze_to_pln(offer.get("price_gross") or offer.get("priceGross")),
         "price_with_code": grosze_to_pln(code_price),
-        "promo_code": promo_web.get("code"),
-        "promo_date_from": promo_web.get("date_from"),
-        "promo_date_to": promo_web.get("date_to"),
-        "omnibus_price_web": grosze_to_pln(offer.get("omnibus_price_web")),
-        "omnibus_price_app": grosze_to_pln(offer.get("omnibus_price_app")),
-        "availability": get_nested(offer, "availability", "display_name"),
-        "availability_type": get_nested(offer, "availability", "type"),
-        "available_in_store": offer.get("available_in_store"),
+        "promo_code": get_promo_value(promo_web, "code", "code"),
+        "promo_date_from": get_promo_value(promo_web, "date_from", "dateFrom"),
+        "promo_date_to": get_promo_value(promo_web, "date_to", "dateTo"),
+        "omnibus_price_web": grosze_to_pln(
+            offer.get("omnibus_price_web") or offer.get("omnibusPriceWeb")
+        ),
+        "omnibus_price_app": grosze_to_pln(
+            offer.get("omnibus_price_app") or offer.get("omnibusPriceApp")
+        ),
+        "availability": availability.get("display_name") or availability.get("displayName"),
+        "availability_type": availability.get("type"),
+        "available_in_store": offer.get("available_in_store") or offer.get("availableInStore"),
     }
-
-
-def get_product_state(state):
-    return state.get("Service:GenericProductListService.state", {})
 
 
 def get_total_pages(state):
@@ -184,40 +285,67 @@ def get_page_url(page_number):
     return f"{LISTING_URL}{separator}page={page_number}"
 
 
+def extract_rows_from_state(state, checked_at, seen_product_ids):
+    product_state = get_product_state(state)
+    offers = product_state.get("loadedOffers", [])
+    code_map = extract_code_map(state)
+
+    rows = []
+
+    for offer in offers:
+        product_id = offer.get("product_id") or offer.get("productId")
+
+        if not product_id or product_id in seen_product_ids:
+            continue
+
+        seen_product_ids.add(product_id)
+        rows.append(extract_offer(offer, checked_at, code_map))
+
+    return rows
+
+
 def collect_all_products():
     checked_at = datetime.now(ZoneInfo("Europe/Warsaw")).isoformat(timespec="seconds")
 
-    first_state, first_spark_url = fetch_spark_state(get_page_url(1))
+    configured_spark_urls = get_configured_spark_urls()
+    seen_product_ids = set()
+    all_rows = []
+
+    # Jeżeli podasz kilka spark-state przez SPARK_STATE_URLS, pobierze wszystkie.
+    if len(configured_spark_urls) > 1:
+        print(f"Używam {len(configured_spark_urls)} skonfigurowanych URL-i spark-state.")
+
+        for spark_url in configured_spark_urls:
+            state, used_url = fetch_spark_state_direct(spark_url)
+            rows = extract_rows_from_state(state, checked_at, seen_product_ids)
+            all_rows.extend(rows)
+            print(f"Spark-state: {used_url} | produktów: {len(rows)}")
+
+        return all_rows
+
+    # Domyślnie pobieramy znany spark-state z Twojego cURL-a.
+    first_state, first_spark_url = fetch_spark_state_with_fallback(get_page_url(1))
+
+    product_state = get_product_state(first_state)
+    offers_count = product_state.get("offersCount")
     total_pages = get_total_pages(first_state)
 
-    all_rows = []
-    seen_product_ids = set()
+    rows = extract_rows_from_state(first_state, checked_at, seen_product_ids)
+    all_rows.extend(rows)
 
-    print(f"Znaleziono stron: {total_pages}")
-    print(f"Spark-state page 1: {first_spark_url}")
+    print(f"Spark-state: {first_spark_url}")
+    print(f"Zapisano z pierwszego spark-state: {len(rows)} produktów")
 
-    for page in range(1, total_pages + 1):
-        if page == 1:
-            state = first_state
-            spark_url = first_spark_url
-        else:
-            state, spark_url = fetch_spark_state(get_page_url(page))
+    if offers_count:
+        print(f"offersCount według strony: {offers_count}")
 
-        product_state = get_product_state(state)
-        offers = product_state.get("loadedOffers", [])
-        code_map = extract_code_map(state)
-
-        print(f"Page {page}: {len(offers)} produktów, spark: {spark_url}")
-
-        for offer in offers:
-            product_id = offer.get("product_id")
-
-            if not product_id or product_id in seen_product_ids:
-                continue
-
-            seen_product_ids.add(product_id)
-            row = extract_offer(offer, checked_at, code_map)
-            all_rows.append(row)
+    if total_pages > 1:
+        print(
+            "UWAGA: strona pokazuje więcej niż 1 stronę wyników, "
+            "ale GitHub może blokować listing kodem 403. "
+            "Jeżeli chcesz pobrać kolejne strony, dodaj ich adresy spark-state "
+            "do zmiennej SPARK_STATE_URLS po przecinku."
+        )
 
     return all_rows
 
