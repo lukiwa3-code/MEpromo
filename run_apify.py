@@ -2,6 +2,7 @@ import csv
 import json
 import os
 import time
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -74,7 +75,7 @@ async function pageFunction(context) {
 
     function extractRowsFromState(state) {
         const productState = state['Service:GenericProductListService.state'] || {};
-        const offers = productState.loadedOffers || [];
+        const offers = Array.isArray(productState.loadedOffers) ? productState.loadedOffers : [];
         const codeMap = extractCodeMap(state);
 
         return offers.map((offer) => {
@@ -105,18 +106,29 @@ async function pageFunction(context) {
                 product_parent_id: offer.product_parent_id || offer.productParentId || null,
                 name,
                 url: fullUrl,
-                price_gross: groszeToPln(offer.price_gross || offer.priceGross),
+                price_gross: groszeToPln(offer.price_gross ?? offer.priceGross),
                 price_with_code: groszeToPln(codePrice.amount),
                 promo_code: promoWeb.code || null,
                 promo_date_from: promoWeb.date_from || promoWeb.dateFrom || null,
                 promo_date_to: promoWeb.date_to || promoWeb.dateTo || null,
-                omnibus_price_web: groszeToPln(offer.omnibus_price_web || offer.omnibusPriceWeb),
-                omnibus_price_app: groszeToPln(offer.omnibus_price_app || offer.omnibusPriceApp),
+                omnibus_price_web: groszeToPln(offer.omnibus_price_web ?? offer.omnibusPriceWeb),
+                omnibus_price_app: groszeToPln(offer.omnibus_price_app ?? offer.omnibusPriceApp),
                 availability: availability.display_name || availability.displayName || null,
                 availability_type: availability.type || null,
-                available_in_store: offer.available_in_store || offer.availableInStore || null,
+                available_in_store: offer.available_in_store ?? offer.availableInStore ?? null,
             };
         });
+    }
+
+    function getProductStateInfo(state) {
+        const productState = state['Service:GenericProductListService.state'] || {};
+        const loadedOffers = Array.isArray(productState.loadedOffers) ? productState.loadedOffers : [];
+        return {
+            loadedOffersCount: loadedOffers.length,
+            offersCount: productState.offersCount || null,
+            totalPages: productState.totalPages || null,
+            currentPage: productState.currentPage || null,
+        };
     }
 
     async function getBodyText() {
@@ -131,6 +143,59 @@ async function pageFunction(context) {
             }
             return await response.json();
         }, sparkUrl);
+    }
+
+    function unique(values) {
+        return [...new Set(values.filter(Boolean))];
+    }
+
+    async function collectSparkUrls() {
+        const performanceUrls = await page.evaluate(() =>
+            performance
+                .getEntriesByType('resource')
+                .map((entry) => entry.name)
+                .filter((url) => url.includes('/spark-state/'))
+        ).catch(() => []);
+
+        const html = await page.content();
+        const htmlMatches = [...html.matchAll(/\/spark-state\/[a-zA-Z0-9\-]+/g)]
+            .map((match) => new URL(match[0], 'https://www.mediaexpert.pl').href);
+
+        return unique([...performanceUrls, ...htmlMatches]);
+    }
+
+    async function chooseBestSparkState(sparkUrls) {
+        const candidates = [];
+
+        for (const sparkUrl of sparkUrls) {
+            try {
+                const state = await fetchSparkState(sparkUrl);
+                const rows = extractRowsFromState(state);
+                const info = getProductStateInfo(state);
+
+                log.info(
+                    `Spark candidate: rows=${rows.length}, loadedOffers=${info.loadedOffersCount}, ` +
+                    `offersCount=${info.offersCount}, totalPages=${info.totalPages}, url=${sparkUrl}`
+                );
+
+                candidates.push({
+                    source: 'spark-state',
+                    sparkUrl,
+                    state,
+                    rows,
+                    ...info,
+                });
+            } catch (error) {
+                log.info(`Nie udało się pobrać lub odczytać spark-state ${sparkUrl}: ${error.message}`);
+            }
+        }
+
+        candidates.sort((a, b) => {
+            if (b.rows.length !== a.rows.length) return b.rows.length - a.rows.length;
+            return (b.offersCount || 0) - (a.offersCount || 0);
+        });
+
+        return candidates[0] || null;
     }
 
     await page.waitForLoadState('domcontentloaded', { timeout: 90000 }).catch(() => {});
@@ -157,41 +222,12 @@ async function pageFunction(context) {
         };
     }
 
-    let sparkUrl = null;
-    let state = null;
+    const sparkUrls = await collectSparkUrls();
+    log.info(`Spark-state candidate count: ${sparkUrls.length}`);
 
-    const resourceUrls = await page.evaluate(() =>
-        performance
-            .getEntriesByType('resource')
-            .map((entry) => entry.name)
-            .filter((url) => url.includes('/spark-state/'))
-    ).catch(() => []);
+    const best = await chooseBestSparkState(sparkUrls);
 
-    log.info(`Spark-state resource count: ${resourceUrls.length}`);
-
-    if (resourceUrls.length > 0) {
-        sparkUrl = resourceUrls[resourceUrls.length - 1];
-        try {
-            state = await fetchSparkState(sparkUrl);
-        } catch (error) {
-            log.info(`Nie udało się pobrać spark-state z performance: ${error.message}`);
-        }
-    }
-
-    if (!state) {
-        const html = await page.content();
-        const match = html.match(/\/spark-state\/[a-zA-Z0-9\-]+/);
-        if (match) {
-            sparkUrl = new URL(match[0], 'https://www.mediaexpert.pl').href;
-            try {
-                state = await fetchSparkState(sparkUrl);
-            } catch (error) {
-                log.info(`Nie udało się pobrać spark-state z HTML: ${error.message}`);
-            }
-        }
-    }
-
-    if (!state) {
+    if (!best) {
         return {
             source: 'no-spark-state',
             status,
@@ -201,17 +237,15 @@ async function pageFunction(context) {
         };
     }
 
-    const rows = extractRowsFromState(state);
-    const productState = state['Service:GenericProductListService.state'] || {};
-
     return {
-        source: 'spark-state',
-        sparkUrl,
+        source: best.source,
+        sparkUrl: best.sparkUrl,
         status,
-        count: rows.length,
-        offersCount: productState.offersCount || null,
-        totalPages: productState.totalPages || null,
-        rows,
+        count: best.rows.length,
+        offersCount: best.offersCount || null,
+        totalPages: best.totalPages || null,
+        currentPage: best.currentPage || null,
+        rows: best.rows,
     };
 }
 """
@@ -368,11 +402,11 @@ def call_apify():
 
     log_text = fetch_run_log(run_id)
     print("--- Apify log preview ---")
-    print(log_text[-7000:])
+    print(log_text[-9000:])
     print("--- end Apify log preview ---")
 
     if final_run.get("status") != "SUCCEEDED":
-        raise RuntimeError(f"Apify run nie zakończył się sukcesem. Final run: {final_run}")
+        raise RuntimeError(f"Apify run nie zakończył się sukcesem. Status: {final_run.get('status')}")
 
     dataset_id = final_run.get("defaultDatasetId")
     if not dataset_id:
@@ -394,10 +428,12 @@ def normalize_rows(apify_items):
         )
 
     rows = first_item.get("rows") or []
+    offers_count = first_item.get("offersCount")
 
     print(f"Źródło Apify: {first_item.get('source')}")
     print(f"Status strony: {first_item.get('status')}")
     print(f"Liczba produktów: {len(rows)}")
+    print(f"offersCount ze strony: {offers_count}")
 
     if first_item.get("sparkUrl"):
         print(f"Spark-state: {first_item.get('sparkUrl')}")
@@ -409,6 +445,12 @@ def normalize_rows(apify_items):
         raise RuntimeError(
             "Apify uruchomił scraper, ale nie pobrał produktów. "
             "Jeśli source=blocked, trzeba w Apify włączyć lepszy proxy, np. residential."
+        )
+
+    if offers_count and len(rows) < min(20, int(float(offers_count) * 0.5)):
+        raise RuntimeError(
+            f"Scraper pobrał podejrzanie mało produktów: {len(rows)} z offersCount={offers_count}. "
+            "Nie zapisuję danych, żeby nie nadpisać pełnej tabeli niepełnym wynikiem."
         )
 
     return rows
@@ -460,8 +502,64 @@ def load_previous_latest():
     return result
 
 
+def load_history_first_seen():
+    if not HISTORY_FILE.exists() or HISTORY_FILE.stat().st_size == 0:
+        return {}
+
+    first_seen_by_key = {}
+    try:
+        with HISTORY_FILE.open("r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                key = product_key(row)
+                checked_at = row.get("checked_at")
+                if key and checked_at and key not in first_seen_by_key:
+                    first_seen_by_key[key] = checked_at
+    except OSError as exc:
+        print(f"Nie udało się odczytać historii do first_seen: {exc}")
+
+    return first_seen_by_key
+
+
+def get_history_last_batch_count():
+    if not HISTORY_FILE.exists() or HISTORY_FILE.stat().st_size == 0:
+        return 0
+
+    last_checked_at = None
+    count = 0
+
+    try:
+        with HISTORY_FILE.open("r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                checked_at = row.get("checked_at")
+                if not checked_at:
+                    continue
+                if checked_at != last_checked_at:
+                    last_checked_at = checked_at
+                    count = 1
+                else:
+                    count += 1
+    except OSError as exc:
+        print(f"Nie udało się policzyć ostatniej paczki historii: {exc}")
+        return 0
+
+    return count
+
+
+def guard_against_partial_result(rows):
+    history_last_count = get_history_last_batch_count()
+
+    if history_last_count >= 20 and len(rows) < max(10, int(history_last_count * 0.7)):
+        raise RuntimeError(
+            f"Scraper pobrał tylko {len(rows)} produktów, a ostatnia pełna paczka w historii miała "
+            f"{history_last_count}. Nie zapisuję danych, żeby nie skurczyć tabeli."
+        )
+
+
 def enrich_tracking_dates(rows):
     previous_by_key = load_previous_latest()
+    history_first_seen = load_history_first_seen()
     new_count = 0
     changed_count = 0
 
@@ -471,7 +569,12 @@ def enrich_tracking_dates(rows):
         checked_at = row.get("checked_at") or ""
 
         if previous:
-            row["first_seen_at"] = previous.get("first_seen_at") or previous.get("checked_at") or checked_at
+            row["first_seen_at"] = (
+                previous.get("first_seen_at")
+                or history_first_seen.get(key)
+                or previous.get("checked_at")
+                or checked_at
+            )
             old_signature = price_signature(previous)
             new_signature = price_signature(row)
 
@@ -489,13 +592,14 @@ def enrich_tracking_dates(rows):
 
             row["is_new_product"] = False
         else:
-            row["first_seen_at"] = checked_at
+            row["first_seen_at"] = history_first_seen.get(key) or checked_at
             row["price_changed_at"] = None
             row["previous_price_gross"] = None
             row["previous_price_with_code"] = None
             row["price_changed_now"] = False
-            row["is_new_product"] = True
-            new_count += 1
+            row["is_new_product"] = key not in history_first_seen
+            if row["is_new_product"]:
+                new_count += 1
 
     print(f"Nowe produkty w tym odświeżeniu: {new_count}")
     print(f"Produkty ze zmianą ceny w tym odświeżeniu: {changed_count}")
@@ -554,6 +658,7 @@ def main():
     print("Uruchamiam Apify Playwright Scraper...")
     apify_items = call_apify()
     rows = normalize_rows(apify_items)
+    guard_against_partial_result(rows)
     rows = enrich_tracking_dates(rows)
 
     save_latest(rows)
