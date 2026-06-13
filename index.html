@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Media Expert LEGO Promo Tracker</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --line: #334155;
+      --accent: #facc15;
+      --good: #22c55e;
+      --bad: #ef4444;
+      --blue: #38bdf8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: radial-gradient(circle at top left, #1e293b, var(--bg));
+      color: var(--text);
+    }
+
+    header {
+      padding: 28px 18px 18px;
+      max-width: 1250px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(26px, 4vw, 42px);
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .dashboard {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 0 18px 30px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      background: linear-gradient(180deg, var(--card2), var(--card));
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 15px;
+      box-shadow: 0 14px 28px rgba(0,0,0,.25);
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .stat .value {
+      margin-top: 8px;
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid var(--line);
+      background: #020617;
+      color: var(--text);
+      border-radius: 12px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus { border-color: var(--accent); }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: rgba(15, 23, 42, .7);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1080px;
+    }
+
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(51, 65, 85, .75);
+      text-align: left;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #020617;
+      color: #f8fafc;
+      z-index: 1;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: rgba(250, 204, 21, .07); }
+
+    .name {
+      font-weight: 700;
+      max-width: 330px;
+    }
+
+    .code {
+      display: inline-block;
+      padding: 4px 8px;
+      background: rgba(250, 204, 21, .14);
+      color: var(--accent);
+      border: 1px solid rgba(250, 204, 21, .35);
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    .price { font-weight: 800; white-space: nowrap; }
+    .promo { color: var(--good); }
+    .missing { color: var(--muted); }
+
+    .discount-good {
+      color: var(--good);
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .discount-bad {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .footer-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .error {
+      background: rgba(239, 68, 68, .12);
+      border: 1px solid rgba(239, 68, 68, .45);
+      color: #fecaca;
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    @media (max-width: 850px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .controls { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LEGO Promo Tracker</h1>
+    <p class="subtitle">Ceny z Media Expert z pliku <strong>data/latest_prices.json</strong>. Tabelka sama odświeża dane po każdym uruchomieniu GitHub Actions.</p>
+  </header>
+
+  <main class="dashboard">
+    <div id="errorBox" class="error"></div>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="label">Produkty</div>
+        <div id="statCount" class="value">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">Z ceną z kodem</div>
+        <div id="statPromo" class="value">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">Największa obniżka</div>
+        <div id="statBest" class="value">-</div>
+      </div>
+      <div class="stat">
+        <div class="label">Ostatnia aktualizacja</div>
+        <div id="statDate" class="value" style="font-size:17px">-</div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <input id="searchInput" type="search" placeholder="Szukaj po nazwie, kodzie LEGO, kodzie rabatowym..." />
+      <select id="promoFilter">
+        <option value="all">Wszystkie produkty</option>
+        <option value="promo">Tylko z ceną z kodem</option>
+        <option value="noPromo">Bez ceny z kodem</option>
+      </select>
+      <select id="sortSelect">
+        <option value="discount_desc">Największa obniżka</option>
+        <option value="price_asc">Cena rosnąco</option>
+        <option value="price_desc">Cena malejąco</option>
+        <option value="code_asc">Kod LEGO A-Z</option>
+        <option value="name_asc">Nazwa A-Z</option>
+      </select>
+    </section>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="lego_code">Kod LEGO</th>
+            <th data-sort="name">Produkt</th>
+            <th data-sort="price_gross">Cena</th>
+            <th data-sort="price_with_code">Cena z kodem</th>
+            <th data-sort="discount_value">Różnica</th>
+            <th>Kod rabatowy</th>
+            <th>Dostępność</th>
+            <th>Omnibus</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </section>
+
+    <p class="footer-note">Kliknij nagłówek kolumny, żeby sortować. Dane pochodzą z ostatniego pliku wygenerowanego przez scraper.</p>
+  </main>
+
+  <script>
+    let products = [];
+    let currentSort = "discount_desc";
+
+    const money = value => {
+      if (value === null || value === undefined || value === "") return "-";
+      return Number(value).toLocaleString("pl-PL", { style: "currency", currency: "PLN" });
+    };
+
+    const safe = value => String(value ?? "");
+
+    const calcDiscount = item => {
+      const normal = Number(item.price_gross || 0);
+      const promo = Number(item.price_with_code || 0);
+      if (!normal || !promo) return null;
+      return Math.round((normal - promo) * 100) / 100;
+    };
+
+    const calcDiscountPct = item => {
+      const normal = Number(item.price_gross || 0);
+      const discount = calcDiscount(item);
+      if (!normal || discount === null) return null;
+      return Math.round((discount / normal) * 1000) / 10;
+    };
+
+    async function loadData() {
+      try {
+        const response = await fetch("data/latest_prices.json?ts=" + Date.now());
+        if (!response.ok) throw new Error("Nie mogę pobrać data/latest_prices.json. Status: " + response.status);
+        products = await response.json();
+        updateStats();
+        renderTable();
+      } catch (error) {
+        const box = document.getElementById("errorBox");
+        box.style.display = "block";
+        box.textContent = "Błąd ładowania danych: " + error.message + ". Najpierw uruchom scraper, żeby powstał plik data/latest_prices.json.";
+      }
+    }
+
+    function updateStats() {
+      const promoCount = products.filter(p => p.price_with_code).length;
+      const best = products
+        .map(p => calcDiscount(p))
+        .filter(v => v !== null && v > 0)
+        .sort((a, b) => b - a)[0];
+      const lastDate = products[0]?.checked_at || "-";
+
+      document.getElementById("statCount").textContent = products.length;
+      document.getElementById("statPromo").textContent = promoCount;
+      document.getElementById("statBest").textContent = best ? money(best) : "-";
+      document.getElementById("statDate").textContent = lastDate.replace("T", " ");
+    }
+
+    function getFilteredProducts() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const promoFilter = document.getElementById("promoFilter").value;
+
+      let rows = products.filter(item => {
+        const text = [item.lego_code, item.name, item.promo_code, item.availability]
+          .map(safe)
+          .join(" ")
+          .toLowerCase();
+
+        const matchesSearch = !q || text.includes(q);
+        const hasPromo = !!item.price_with_code;
+
+        const matchesPromo =
+          promoFilter === "all" ||
+          (promoFilter === "promo" && hasPromo) ||
+          (promoFilter === "noPromo" && !hasPromo);
+
+        return matchesSearch && matchesPromo;
+      });
+
+      rows = rows.map(item => ({
+        ...item,
+        discount_value: calcDiscount(item),
+        discount_pct: calcDiscountPct(item)
+      }));
+
+      rows.sort((a, b) => {
+        switch (currentSort) {
+          case "price_asc": return Number(a.price_gross || 0) - Number(b.price_gross || 0);
+          case "price_desc": return Number(b.price_gross || 0) - Number(a.price_gross || 0);
+          case "code_asc": return safe(a.lego_code).localeCompare(safe(b.lego_code), "pl");
+          case "name_asc": return safe(a.name).localeCompare(safe(b.name), "pl");
+          case "discount_asc": return Number(a.discount_value || 0) - Number(b.discount_value || 0);
+          case "discount_desc":
+          default: return Number(b.discount_value || 0) - Number(a.discount_value || 0);
+        }
+      });
+
+      return rows;
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      const rows = getFilteredProducts();
+
+      tbody.innerHTML = rows.map(item => {
+        const discount = item.discount_value;
+        const pct = item.discount_pct;
+        const discountText = discount && discount > 0
+          ? `<span class="discount-good">-${money(discount)} (${pct}%)</span>`
+          : `<span class="discount-bad">-</span>`;
+
+        const promoPrice = item.price_with_code
+          ? `<span class="price promo">${money(item.price_with_code)}</span>`
+          : `<span class="missing">-</span>`;
+
+        const promoCode = item.promo_code
+          ? `<span class="code">${safe(item.promo_code)}</span>`
+          : `<span class="missing">-</span>`;
+
+        const legoCode = item.lego_code
+          ? `<span class="code">${safe(item.lego_code)}</span>`
+          : `<span class="missing">-</span>`;
+
+        const link = item.url
+          ? `<a href="${item.url}" target="_blank" rel="noopener">Otwórz</a>`
+          : "-";
+
+        return `
+          <tr>
+            <td>${legoCode}</td>
+            <td class="name">${safe(item.name)}</td>
+            <td><span class="price">${money(item.price_gross)}</span></td>
+            <td>${promoPrice}</td>
+            <td>${discountText}</td>
+            <td>${promoCode}</td>
+            <td>${safe(item.availability) || "-"}</td>
+            <td>${money(item.omnibus_price_web)}</td>
+            <td>${link}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    document.getElementById("searchInput").addEventListener("input", renderTable);
+    document.getElementById("promoFilter").addEventListener("change", renderTable);
+    document.getElementById("sortSelect").addEventListener("change", event => {
+      currentSort = event.target.value;
+      renderTable();
+    });
+
+    document.querySelectorAll("th[data-sort]").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.sort;
+        if (key === "discount_value") currentSort = currentSort === "discount_desc" ? "discount_asc" : "discount_desc";
+        else if (key === "price_gross") currentSort = currentSort === "price_asc" ? "price_desc" : "price_asc";
+        else if (key === "lego_code") currentSort = "code_asc";
+        else if (key === "name") currentSort = "name_asc";
+        else if (key === "price_with_code") currentSort = "discount_desc";
+        renderTable();
+      });
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
