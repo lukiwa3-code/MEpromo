@@ -31,12 +31,12 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      - name: Run Apify scraper
+      - name: Run Apify scraper safely
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           APIFY_PROXY_GROUPS: ${{ vars.APIFY_PROXY_GROUPS }}
           APIFY_PROXY_COUNTRY: ${{ vars.APIFY_PROXY_COUNTRY }}
-        run: python run_apify.py
+        run: python run_apify_safe.py
 
       - name: Commit updated data
         run: |
