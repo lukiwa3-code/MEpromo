@@ -5,7 +5,10 @@ on:
     branches:
       - main
   schedule:
-    - cron: "17 * * * *"
+    # GitHub cron działa w UTC.
+    # 17 5-21 * * * = bezpiecznie poza 00:00-06:00 czasu polskiego,
+    # zarówno zimą, jak i latem.
+    - cron: "17 5-21 * * *"
   workflow_dispatch:
 
 permissions:
