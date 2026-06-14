@@ -5,10 +5,10 @@ on:
     branches:
       - main
   schedule:
-    # GitHub cron działa w UTC i nie obsługuje strefy Europe/Warsaw.
-    # Dlatego workflow startuje co godzinę o 33. minucie, a run_apify_safe.py pomija
+    # TEST: GitHub cron działa w UTC i nie zawsze startuje dokładnie w wybranej minucie.
+    # Na czas testów odpalamy co 5 minut, a run_apify_safe.py pomija
     # zaplanowane uruchomienia między 00:00 a 05:59 czasu polskiego.
-    - cron: "33 * * * *"
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
