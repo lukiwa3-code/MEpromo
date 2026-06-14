@@ -1,10 +1,14 @@
 import csv
 import json
+import os
 import traceback
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 import run_apify
 
 MIN_GOOD_ROWS = 20
+WARSAW_TZ = ZoneInfo("Europe/Warsaw")
 
 
 def latest_rows_count():
@@ -13,6 +17,25 @@ def latest_rows_count():
     except Exception:
         return 0
     return len(rows) if isinstance(rows, list) else 0
+
+
+def scheduled_run_should_be_skipped():
+    """Skip only automatic scheduled runs between 00:00 and 05:59 Warsaw time.
+
+    Manual runs from the GitHub Actions button should always work, even at night.
+    """
+    event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+    if event_name != "schedule":
+        return False
+
+    now_warsaw = datetime.now(WARSAW_TZ)
+    print(f"Aktualny czas Warszawa: {now_warsaw:%Y-%m-%d %H:%M:%S %Z}")
+
+    if 0 <= now_warsaw.hour < 6:
+        print("Zaplanowane odswiezenie pominiete: przedzial 00:00-05:59 czasu polskiego.")
+        return True
+
+    return False
 
 
 def to_int(value):
@@ -94,6 +117,9 @@ def restore_latest_from_history():
 
 
 def main():
+    if scheduled_run_should_be_skipped():
+        return
+
     try:
         run_apify.main()
     except Exception as exc:
