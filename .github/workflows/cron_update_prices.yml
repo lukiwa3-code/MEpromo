@@ -1,0 +1,46 @@
+name: Cron Media Expert LEGO prices
+
+on:
+  schedule:
+    # TEST: odpalaj co 5 minut w czasie polskim.
+    # Po potwierdzeniu działania ustawimy: cron "33 6-23 * * *".
+    - cron: "*/5 6-23 * * *"
+      timezone: "Europe/Warsaw"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Run Apify scraper safely
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          APIFY_PROXY_GROUPS: ${{ vars.APIFY_PROXY_GROUPS }}
+          APIFY_PROXY_COUNTRY: ${{ vars.APIFY_PROXY_COUNTRY }}
+        run: python run_apify_safe.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add data/latest_prices.json data/price_history.csv
+
+          git diff --cached --quiet || git commit -m "Update LEGO prices"
+          git push
