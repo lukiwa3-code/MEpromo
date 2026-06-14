@@ -1,11 +1,6 @@
-name: Cron Media Expert LEGO prices
+name: Manual Media Expert LEGO prices
 
 on:
-  schedule:
-    # TEST: GitHub Actions NIE obsługuje pola timezone przy schedule.
-    # Odpalamy co 5 minut w UTC, a run_listing_only_safe.py sam pomija
-    # zaplanowane uruchomienia między 00:00 a 05:59 czasu polskiego.
-    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
