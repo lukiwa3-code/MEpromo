@@ -1,8 +1,9 @@
 {
-  "attempted_at_warsaw": "2026-06-14T16:38:14+02:00",
-  "event_name": "workflow_dispatch",
-  "status": "failed_kept_previous",
-  "message": "Nie pobrano nowych danych, zostawiono poprzednie poprawne ceny.",
+  "attempted_at_warsaw": "2026-06-14T18:02:49+02:00",
+  "event_name": "schedule",
+  "mode": "listing_only",
+  "status": "failed_kept_previous_listing_only",
+  "message": "Nie pobrano aktualnej listy ze strony promocji. Zostawiono poprzednią poprawną listę.",
   "error": "Apify pageFunction zakończył się błędem. Rekord błędu: {\"#error\": true, \"#debug\": {\"requestId\": \"55AY31H6HhVVjqg\", \"url\": \"https://www.mediaexpert.pl/zabawki/lego/lego/promocje_cena-z-kodem?limit=50\", \"method\": \"GET\", \"retryCount\": 3, \"errorMessages\": [\"Error: Navigation timed out after 60 seconds.\\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:360:46)\\n    at PlaywrightCrawler._handleNavigation (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:337:24)\\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:260:13)\\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/playwright/internals/playwright-crawler.js:114:9)\\n    at async wrap (/home/myuser/node_modules/@apify/timeout/cjs/index.cjs:54:21)\", \"Error: Navigation timed out after 60 seconds.\\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:360:46)\\n    at PlaywrightCrawler._handleNavigation (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:337:24)\\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/browser/internals/browser-crawler.js:260:13)\\n    at async PlaywrightCrawler._runRequestHandler (/home/myuser/node_modules/@crawlee/playwright/internals/playwright-crawler.js:114:9)\\n    at async wrap (/home/myuser/node_modules/@apify/timeout/cjs/index.cjs:54:21)\", \"Error: Navigation timed out after 60 seconds.\\n    at handleRequestTimeout (/home/myuser/node_modules/@crawlee/core/crawlers/crawler_utils.js:13:11)\\n    at PlaywrightCrawler._handleNavigationTimeout (/home/myuser/node_modules",
   "latest_rows_after": 50
 }
