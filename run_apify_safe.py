@@ -5,6 +5,7 @@ import traceback
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+import me_api_fallback
 import run_apify
 
 MIN_GOOD_ROWS = 20
@@ -135,6 +136,18 @@ def restore_latest_from_history():
     return len(normalized)
 
 
+def try_product_api_fallback(original_error):
+    print("\nPróbuję fallbacku przez bezpośrednie Product API Media Expert dla znanych product_id...")
+    rows = me_api_fallback.refresh_known_products_from_api()
+    write_status(
+        "success_product_api_fallback",
+        "Apify nie pobrało listingu, ale ceny znanych produktów odświeżono przez Product API.",
+        original_error=str(original_error)[:2000],
+        latest_rows_after=len(rows),
+    )
+    return rows
+
+
 def main():
     if scheduled_run_should_be_skipped():
         return
@@ -146,19 +159,29 @@ def main():
         write_status("success", "Pobrano i zapisano nowe dane z Media Expert.", latest_rows_after=latest_rows_count())
     except Exception as exc:
         existing_count = latest_rows_count()
-        print("\nUWAGA: Biezace odswiezenie nie pobralo nowych danych.")
+        print("\nUWAGA: Apify nie pobralo nowych danych z listingu.")
         print(f"Powod: {exc}")
         print("Pelny traceback dla diagnostyki:")
         traceback.print_exc()
+
         if existing_count >= MIN_GOOD_ROWS:
-            print(f"\nZostawiam poprzednie poprawne dane: {existing_count} produktow.")
-            write_status(
-                "failed_kept_previous",
-                "Nie pobrano nowych danych, zostawiono poprzednie poprawne ceny.",
-                error=str(exc)[:2000],
-                latest_rows_after=existing_count,
-            )
-            return
+            try:
+                try_product_api_fallback(exc)
+                return
+            except Exception as fallback_exc:
+                print("\nFallback Product API tez sie nie udal.")
+                print(f"Powod fallbacku: {fallback_exc}")
+                traceback.print_exc()
+                print(f"\nZostawiam poprzednie poprawne dane: {existing_count} produktow.")
+                write_status(
+                    "failed_kept_previous",
+                    "Nie pobrano nowych danych ani z Apify, ani z Product API. Zostawiono poprzednie ceny.",
+                    error=str(exc)[:2000],
+                    fallback_error=str(fallback_exc)[:2000],
+                    latest_rows_after=existing_count,
+                )
+                return
+
         print(f"\nlatest_prices.json ma tylko {existing_count} produktow. Odtwarzam z historii.")
         restored_count = restore_latest_from_history()
         if restored_count >= MIN_GOOD_ROWS:
