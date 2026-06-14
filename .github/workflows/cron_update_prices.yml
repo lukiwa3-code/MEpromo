@@ -2,10 +2,10 @@ name: Cron Media Expert LEGO prices
 
 on:
   schedule:
-    # TEST: odpalaj co 5 minut w czasie polskim.
-    # Po potwierdzeniu działania ustawimy: cron "33 6-23 * * *".
-    - cron: "*/5 6-23 * * *"
-      timezone: "Europe/Warsaw"
+    # TEST: GitHub Actions NIE obsługuje pola timezone przy schedule.
+    # Odpalamy co 5 minut w UTC, a run_apify_safe.py sam pomija
+    # zaplanowane uruchomienia między 00:00 a 05:59 czasu polskiego.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 permissions:
