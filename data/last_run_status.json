@@ -1,6 +1,6 @@
 {
-  "attempted_at_warsaw": "2026-06-14T19:01:47+02:00",
-  "event_name": "workflow_dispatch",
+  "attempted_at_warsaw": "2026-06-14T19:27:51+02:00",
+  "event_name": "schedule",
   "mode": "listing_only",
   "status": "failed_kept_previous_listing_only",
   "message": "Nie pobrano aktualnej listy ze strony promocji. Zostawiono poprzednią poprawną listę.",
