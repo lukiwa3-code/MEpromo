@@ -2,7 +2,6 @@ import csv
 import json
 import os
 import time
-from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -10,7 +9,6 @@ import requests
 
 ACTOR_ID = "apify~playwright-scraper"
 APIFY_BASE_URL = "https://api.apify.com/v2"
-
 LISTING_URL = "https://www.mediaexpert.pl/zabawki/lego/lego/promocje_cena-z-kodem?limit=50"
 DATA_DIR = Path("data")
 LATEST_FILE = DATA_DIR / "latest_prices.json"
@@ -132,7 +130,7 @@ async function pageFunction(context) {
     }
 
     async function getBodyText() {
-        return await page.locator('body').innerText({ timeout: 15000 }).catch(() => '');
+        return await page.locator('body').innerText({ timeout: 10000 }).catch(() => '');
     }
 
     async function fetchSparkState(sparkUrl) {
@@ -157,7 +155,7 @@ async function pageFunction(context) {
                 .filter((url) => url.includes('/spark-state/'))
         ).catch(() => []);
 
-        const html = await page.content();
+        const html = await page.content().catch(() => '');
         const htmlMatches = [...html.matchAll(/\/spark-state\/[a-zA-Z0-9\-]+/g)]
             .map((match) => new URL(match[0], 'https://www.mediaexpert.pl').href);
 
@@ -198,9 +196,11 @@ async function pageFunction(context) {
         return candidates[0] || null;
     }
 
-    await page.waitForLoadState('domcontentloaded', { timeout: 90000 }).catch(() => {});
-    await page.waitForLoadState('networkidle', { timeout: 25000 }).catch(() => {});
-    await page.waitForTimeout(10000);
+    // Nie czekamy na networkidle, bo Media Expert potrafi trzymać stale requesty.
+    await page.waitForLoadState('domcontentloaded', { timeout: 45000 }).catch(() => {});
+    await page.waitForTimeout(7000);
+    await page.evaluate(() => window.scrollTo(0, Math.min(document.body.scrollHeight, 5000))).catch(() => {});
+    await page.waitForTimeout(3000);
 
     const status = getStatus(response);
     const bodyText = await getBodyText();
@@ -291,9 +291,18 @@ def build_actor_input():
         "proxyConfiguration": build_proxy_configuration(),
         "browserLog": False,
         "debugLog": True,
-        "navigationTimeoutSecs": 120,
-        "requestHandlerTimeoutSecs": 180,
         "useChrome": True,
+        "launcher": "chromium",
+        "headless": True,
+        "respectRobotsTxtFile": False,
+        "waitUntil": "domcontentloaded",
+        "pageLoadTimeoutSecs": 180,
+        "pageFunctionTimeoutSecs": 240,
+        "maxRequestRetries": 2,
+        "maxScrollHeightPixels": 5000,
+        "globs": [],
+        "pseudoUrls": [],
+        "excludes": [],
     }
 
 
@@ -324,12 +333,7 @@ def parse_apify_json_response(response, action_name):
 
 
 def apify_post_json(url, payload, action_name, timeout=120):
-    response = requests.post(
-        url,
-        headers=auth_headers(),
-        json=payload,
-        timeout=timeout,
-    )
+    response = requests.post(url, headers=auth_headers(), json=payload, timeout=timeout)
     return parse_apify_json_response(response, action_name)
 
 
@@ -350,7 +354,7 @@ def get_actor_run(run_id):
     return payload.get("data", payload)
 
 
-def wait_for_actor_run(run_id, max_wait_seconds=600):
+def wait_for_actor_run(run_id, max_wait_seconds=900):
     terminal_statuses = {"SUCCEEDED", "FAILED", "ABORTED", "TIMED-OUT"}
     start = time.time()
 
@@ -370,22 +374,21 @@ def wait_for_actor_run(run_id, max_wait_seconds=600):
 
 def fetch_dataset_items(dataset_id):
     url = f"{APIFY_BASE_URL}/datasets/{dataset_id}/items?format=json&clean=false"
-    payload = apify_get_json(url, "fetch_dataset_items", timeout=120)
-    return payload
+    return apify_get_json(url, "fetch_dataset_items", timeout=120)
 
 
 def fetch_run_log(run_id):
     url = f"{APIFY_BASE_URL}/logs/{run_id}"
     response = requests.get(url, headers=auth_headers(), timeout=120)
-
     if response.status_code >= 400:
         return f"Nie udało się pobrać logu Apify. HTTP {response.status_code}: {response.text[:1000]}"
-
     return response.text
 
 
 def call_apify():
     print("Startuję Actor w Apify przez endpoint /runs...")
+    print("Apify input proxy:", json.dumps(build_proxy_configuration(), ensure_ascii=False))
+    print("Apify waitUntil: domcontentloaded, pageLoadTimeoutSecs: 180, pageFunctionTimeoutSecs: 240")
     run = start_actor_run()
 
     run_id = run.get("id")
@@ -443,8 +446,7 @@ def normalize_rows(apify_items):
         print("Pierwszy tekst strony z Apify:")
         print(page_text[:2500])
         raise RuntimeError(
-            "Apify uruchomił scraper, ale nie pobrał produktów. "
-            "Jeśli source=blocked, trzeba w Apify włączyć lepszy proxy, np. residential."
+            "Apify uruchomił scraper, ale nie pobrał produktów z aktualnej strony promocji."
         )
 
     if offers_count and len(rows) < min(20, int(float(offers_count) * 0.5)):
@@ -474,25 +476,19 @@ def price_value(value):
 
 
 def price_signature(row):
-    return (
-        price_value(row.get("price_gross")),
-        price_value(row.get("price_with_code")),
-    )
+    return (price_value(row.get("price_gross")), price_value(row.get("price_with_code")))
 
 
 def load_previous_latest():
     if not LATEST_FILE.exists():
         return {}
-
     try:
         previous_rows = json.loads(LATEST_FILE.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError) as exc:
         print(f"Nie udało się odczytać poprzedniego latest_prices.json: {exc}")
         return {}
-
     if not isinstance(previous_rows, list):
         return {}
-
     result = {}
     for row in previous_rows:
         if isinstance(row, dict):
@@ -505,7 +501,6 @@ def load_previous_latest():
 def load_history_first_seen():
     if not HISTORY_FILE.exists() or HISTORY_FILE.stat().st_size == 0:
         return {}
-
     first_seen_by_key = {}
     try:
         with HISTORY_FILE.open("r", newline="", encoding="utf-8") as file:
@@ -517,17 +512,14 @@ def load_history_first_seen():
                     first_seen_by_key[key] = checked_at
     except OSError as exc:
         print(f"Nie udało się odczytać historii do first_seen: {exc}")
-
     return first_seen_by_key
 
 
 def get_history_last_batch_count():
     if not HISTORY_FILE.exists() or HISTORY_FILE.stat().st_size == 0:
         return 0
-
     last_checked_at = None
     count = 0
-
     try:
         with HISTORY_FILE.open("r", newline="", encoding="utf-8") as file:
             reader = csv.DictReader(file)
@@ -543,13 +535,11 @@ def get_history_last_batch_count():
     except OSError as exc:
         print(f"Nie udało się policzyć ostatniej paczki historii: {exc}")
         return 0
-
     return count
 
 
 def guard_against_partial_result(rows):
     history_last_count = get_history_last_batch_count()
-
     if history_last_count >= 20 and len(rows) < max(10, int(history_last_count * 0.7)):
         raise RuntimeError(
             f"Scraper pobrał tylko {len(rows)} produktów, a ostatnia pełna paczka w historii miała "
@@ -589,7 +579,6 @@ def enrich_tracking_dates(rows):
                 row["previous_price_gross"] = previous.get("previous_price_gross")
                 row["previous_price_with_code"] = previous.get("previous_price_with_code")
                 row["price_changed_now"] = False
-
             row["is_new_product"] = False
         else:
             row["first_seen_at"] = history_first_seen.get(key) or checked_at
@@ -608,10 +597,7 @@ def enrich_tracking_dates(rows):
 
 def save_latest(rows):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    LATEST_FILE.write_text(
-        json.dumps(rows, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    LATEST_FILE.write_text(json.dumps(rows, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def build_fieldnames(existing_fieldnames, rows):
@@ -619,21 +605,17 @@ def build_fieldnames(existing_fieldnames, rows):
     for field in existing_fieldnames:
         if field and field not in fieldnames:
             fieldnames.append(field)
-
     for row in rows:
         for field in row.keys():
             if field not in fieldnames:
                 fieldnames.append(field)
-
     return fieldnames
 
 
 def append_history(rows):
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-
     existing_rows = []
     existing_fieldnames = []
-
     if HISTORY_FILE.exists() and HISTORY_FILE.stat().st_size > 0:
         with HISTORY_FILE.open("r", newline="", encoding="utf-8") as file:
             reader = csv.DictReader(file)
@@ -641,7 +623,6 @@ def append_history(rows):
             existing_rows = list(reader)
 
     fieldnames = build_fieldnames(existing_fieldnames, rows)
-
     if not HISTORY_FILE.exists() or not existing_fieldnames or existing_fieldnames != fieldnames:
         with HISTORY_FILE.open("w", newline="", encoding="utf-8") as file:
             writer = csv.DictWriter(file, fieldnames=fieldnames, extrasaction="ignore")
@@ -655,15 +636,13 @@ def append_history(rows):
 
 
 def main():
-    print("Uruchamiam Apify Playwright Scraper...")
+    print("Uruchamiam Apify Playwright Scraper dla aktualnej listy promocji Media Expert...")
     apify_items = call_apify()
     rows = normalize_rows(apify_items)
     guard_against_partial_result(rows)
     rows = enrich_tracking_dates(rows)
-
     save_latest(rows)
     append_history(rows)
-
     print(f"Zapisano produktów: {len(rows)}")
     print(f"Plik aktualny: {LATEST_FILE}")
     print(f"Historia: {HISTORY_FILE}")
