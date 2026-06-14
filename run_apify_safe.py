@@ -9,6 +9,24 @@ import run_apify
 
 MIN_GOOD_ROWS = 20
 WARSAW_TZ = ZoneInfo("Europe/Warsaw")
+STATUS_FILE = run_apify.DATA_DIR / "last_run_status.json"
+
+
+def now_warsaw_iso():
+    return datetime.now(WARSAW_TZ).isoformat(timespec="seconds")
+
+
+def write_status(status, message, **extra):
+    run_apify.DATA_DIR.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "attempted_at_warsaw": now_warsaw_iso(),
+        "event_name": os.environ.get("GITHUB_EVENT_NAME", ""),
+        "status": status,
+        "message": message,
+        **extra,
+    }
+    STATUS_FILE.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Status odswiezenia: {json.dumps(payload, ensure_ascii=False)}")
 
 
 def latest_rows_count():
@@ -33,6 +51,7 @@ def scheduled_run_should_be_skipped():
 
     if 0 <= now_warsaw.hour < 6:
         print("Zaplanowane odswiezenie pominiete: przedzial 00:00-05:59 czasu polskiego.")
+        write_status("skipped", "Pominieto automatyczne odswiezenie w godzinach nocnych 00:00-05:59.")
         return True
 
     return False
@@ -120,8 +139,11 @@ def main():
     if scheduled_run_should_be_skipped():
         return
 
+    write_status("running", "Start odswiezenia cen.", latest_rows_before=latest_rows_count())
+
     try:
         run_apify.main()
+        write_status("success", "Pobrano i zapisano nowe dane z Media Expert.", latest_rows_after=latest_rows_count())
     except Exception as exc:
         existing_count = latest_rows_count()
         print("\nUWAGA: Biezace odswiezenie nie pobralo nowych danych.")
@@ -130,12 +152,25 @@ def main():
         traceback.print_exc()
         if existing_count >= MIN_GOOD_ROWS:
             print(f"\nZostawiam poprzednie poprawne dane: {existing_count} produktow.")
+            write_status(
+                "failed_kept_previous",
+                "Nie pobrano nowych danych, zostawiono poprzednie poprawne ceny.",
+                error=str(exc)[:2000],
+                latest_rows_after=existing_count,
+            )
             return
         print(f"\nlatest_prices.json ma tylko {existing_count} produktow. Odtwarzam z historii.")
         restored_count = restore_latest_from_history()
         if restored_count >= MIN_GOOD_ROWS:
+            write_status(
+                "failed_restored_from_history",
+                "Nie pobrano nowych danych, odtworzono latest_prices.json z historii.",
+                error=str(exc)[:2000],
+                latest_rows_after=restored_count,
+            )
             print("Workflow koncze jako zielony po odtworzeniu danych z historii.")
             return
+        write_status("failed", "Nie pobrano danych i nie udalo sie odtworzyc historii.", error=str(exc)[:2000])
         raise
 
 
