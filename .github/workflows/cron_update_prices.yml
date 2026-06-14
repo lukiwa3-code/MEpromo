@@ -3,7 +3,7 @@ name: Cron Media Expert LEGO prices
 on:
   schedule:
     # TEST: GitHub Actions NIE obsługuje pola timezone przy schedule.
-    # Odpalamy co 5 minut w UTC, a run_apify_safe.py sam pomija
+    # Odpalamy co 5 minut w UTC, a run_listing_only_safe.py sam pomija
     # zaplanowane uruchomienia między 00:00 a 05:59 czasu polskiego.
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -34,12 +34,12 @@ jobs:
       - name: Install requirements
         run: pip install -r requirements.txt
 
-      - name: Run Apify scraper safely
+      - name: Run listing scraper safely
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
           APIFY_PROXY_GROUPS: ${{ vars.APIFY_PROXY_GROUPS }}
           APIFY_PROXY_COUNTRY: ${{ vars.APIFY_PROXY_COUNTRY }}
-        run: python run_apify_safe.py
+        run: python run_listing_only_safe.py
 
       - name: Commit updated data
         run: |
