@@ -18,7 +18,7 @@ import java.util.*;
 public class MainActivity extends Activity {
     private static final String PREFS = "prefs";
     private static final String KEY = "gh_key";
-    private static final String DATA_URL = "https://raw.githubusercontent.com/lukiwa3-code/MEpromo/main/data/latest_prices.json";
+    private static final String DATA_URL = "https://api.github.com/repos/lukiwa3-code/MEpromo/contents/data/latest_prices.json?ref=main";
     private static final String RUN_URL = "https://api.github.com/repos/lukiwa3-code/MEpromo/actions/workflows/cron_update_prices.yml/dispatches";
     private static final String ACTIONS_URL = "https://github.com/lukiwa3-code/MEpromo/actions/workflows/cron_update_prices.yml";
 
@@ -29,12 +29,27 @@ public class MainActivity extends Activity {
     private ProgressBar bar;
     private EditText search;
     private JSONArray data = new JSONArray();
+    private boolean openedGithubActions = false;
+    private long lastLoadMillis = 0;
     private final NumberFormat pln = NumberFormat.getCurrencyInstance(new Locale("pl", "PL"));
 
     @Override public void onCreate(Bundle b) {
         super.onCreate(b);
         buildScreen();
         loadData();
+    }
+
+    @Override protected void onResume() {
+        super.onResume();
+        if (openedGithubActions) {
+            openedGithubActions = false;
+            status.setText("Wróciłeś z GitHuba. Pobieram najnowsze dane...");
+            ui.postDelayed(() -> loadData(), 1500);
+            ui.postDelayed(() -> loadData(), 90000);
+            ui.postDelayed(() -> loadData(), 240000);
+        } else if (System.currentTimeMillis() - lastLoadMillis > 300000) {
+            loadData();
+        }
     }
 
     private void buildScreen() {
@@ -46,8 +61,7 @@ public class MainActivity extends Activity {
         top.setOrientation(LinearLayout.VERTICAL);
         top.setPadding(dp(14), dp(12), dp(14), dp(8));
 
-        TextView title = tv("ME Promo Tracker", 22, Color.WHITE, true);
-        top.addView(title);
+        top.addView(tv("ME Promo Tracker", 22, Color.WHITE, true));
 
         status = tv("Ładuję dane...", 13, Color.rgb(203, 213, 225), false);
         status.setPadding(0, dp(5), 0, dp(6));
@@ -104,21 +118,23 @@ public class MainActivity extends Activity {
 
     private void loadData() {
         bar.setVisibility(View.VISIBLE);
-        status.setText("Pobieram dane z repo...");
+        status.setText("Pobieram najnowszy plik z GitHuba...");
         new Thread(() -> {
             try {
-                String json = get(DATA_URL + "?t=" + System.currentTimeMillis());
+                String json = get(DATA_URL + "&nocache=" + System.currentTimeMillis(), true);
                 JSONArray arr = new JSONArray(json);
                 ui.post(() -> {
                     data = arr;
+                    lastLoadMillis = System.currentTimeMillis();
                     bar.setVisibility(View.GONE);
-                    status.setText("Dane pobrane do aplikacji.");
+                    status.setText("Dane pobrane bezpośrednio z repozytorium.");
                     render();
                 });
             } catch (Exception e) {
                 ui.post(() -> {
                     bar.setVisibility(View.GONE);
                     status.setText("Błąd pobierania: " + e.getMessage());
+                    Toast.makeText(this, "Nie udało się pobrać danych", Toast.LENGTH_LONG).show();
                 });
             }
         }).start();
@@ -178,7 +194,8 @@ public class MainActivity extends Activity {
         String key = savedKey();
         if (key.isEmpty()) {
             keyDialog();
-            Toast.makeText(this, "Najpierw wpisz klucz GitHub.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Najpierw wpisz klucz GitHub albo uruchom workflow ręcznie w GitHubie.", Toast.LENGTH_LONG).show();
+            openActions();
             return;
         }
         bar.setVisibility(View.VISIBLE);
@@ -196,22 +213,29 @@ public class MainActivity extends Activity {
                 ui.post(() -> {
                     bar.setVisibility(View.GONE);
                     if (code == 204) {
-                        status.setText("Odświeżenie uruchomione. Za 4 minuty pobiorę dane.");
+                        status.setText("Workflow uruchomiony. Będę odpytywał repo przez kilka minut.");
                         Toast.makeText(this, "Workflow uruchomiony", Toast.LENGTH_LONG).show();
-                        ui.postDelayed(() -> loadData(), 240000);
+                        ui.postDelayed(() -> loadData(), 90000);
+                        ui.postDelayed(() -> loadData(), 210000);
+                        ui.postDelayed(() -> loadData(), 330000);
                     } else {
-                        status.setText("GitHub API HTTP " + code);
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ACTIONS_URL)));
+                        status.setText("GitHub API HTTP " + code + ". Otwieram GitHub Actions.");
+                        openActions();
                     }
                 });
             } catch (Exception e) {
                 ui.post(() -> {
                     bar.setVisibility(View.GONE);
-                    status.setText("Błąd: " + e.getMessage());
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ACTIONS_URL)));
+                    status.setText("Błąd: " + e.getMessage() + ". Otwieram GitHub Actions.");
+                    openActions();
                 });
             }
         }).start();
+    }
+
+    private void openActions() {
+        openedGithubActions = true;
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(ACTIONS_URL)));
     }
 
     private void keyDialog() {
@@ -230,10 +254,18 @@ public class MainActivity extends Activity {
 
     private String savedKey() { return getSharedPreferences(PREFS, MODE_PRIVATE).getString(KEY, "").trim(); }
 
-    private String get(String address) throws Exception {
+    private String get(String address, boolean rawGithubApi) throws Exception {
         HttpURLConnection con = (HttpURLConnection) new URL(address).openConnection();
         con.setRequestMethod("GET");
-        con.setRequestProperty("Cache-Control", "no-cache");
+        con.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0");
+        con.setRequestProperty("Pragma", "no-cache");
+        con.setUseCaches(false);
+        if (rawGithubApi) {
+            con.setRequestProperty("Accept", "application/vnd.github.raw");
+            con.setRequestProperty("X-GitHub-Api-Version", "2022-11-28");
+            String key = savedKey();
+            if (!key.isEmpty()) con.setRequestProperty("Authorization", "Bearer " + key);
+        }
         int code = con.getResponseCode();
         InputStream is = code >= 400 ? con.getErrorStream() : con.getInputStream();
         BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
