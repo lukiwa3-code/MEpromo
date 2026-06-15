@@ -1,9 +1,8 @@
 {
-  "attempted_at_warsaw": "2026-06-15T06:55:25+02:00",
+  "attempted_at_warsaw": "2026-06-15T22:33:54+02:00",
   "event_name": "workflow_dispatch",
   "mode": "listing_only",
-  "status": "failed_kept_previous_listing_only",
-  "message": "Nie pobrano aktualnej listy ze strony promocji. Zostawiono poprzednią poprawną listę.",
-  "error": "Apify uruchomił scraper, ale nie pobrał produktów z aktualnej strony promocji.",
+  "status": "success",
+  "message": "Pobrano aktualną listę produktów ze strony promocji Media Expert.",
   "latest_rows_after": 50
 }
