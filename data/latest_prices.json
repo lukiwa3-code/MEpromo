@@ -1,6 +1,6 @@
 [
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "42228",
     "offer_id": 2152611264,
@@ -23,10 +23,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10368",
     "offer_id": 2148336246,
@@ -52,7 +52,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "43032",
     "offer_id": 2153214667,
@@ -78,7 +78,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10343",
     "offer_id": 2149214700,
@@ -104,7 +104,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "21376",
     "offer_id": 2152886764,
@@ -130,7 +130,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "71814",
     "offer_id": 2150359183,
@@ -153,10 +153,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10374",
     "offer_id": 2151885001,
@@ -182,7 +182,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10328",
     "offer_id": 2146800714,
@@ -208,7 +208,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "60470",
     "offer_id": 2150359115,
@@ -231,10 +231,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10295",
     "offer_id": 1040240202,
@@ -257,10 +257,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "11504",
     "offer_id": 2151885169,
@@ -286,7 +286,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "11501",
     "offer_id": 2151885167,
@@ -312,7 +312,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "11502",
     "offer_id": 2152611228,
@@ -338,7 +338,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "71836",
     "offer_id": 2149519154,
@@ -361,10 +361,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10369",
     "offer_id": 2148336278,
@@ -390,7 +390,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "11509",
     "offer_id": 2151885183,
@@ -416,7 +416,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10311",
     "offer_id": 1938707820,
@@ -442,7 +442,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10281",
     "offer_id": 800945955,
@@ -468,7 +468,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "21273",
     "offer_id": 2149519416,
@@ -491,10 +491,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "75398",
     "offer_id": 2148336290,
@@ -517,10 +517,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "60508",
     "offer_id": 2152611308,
@@ -543,10 +543,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "60472",
     "offer_id": 2149214352,
@@ -569,10 +569,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "60455",
     "offer_id": 2150359051,
@@ -595,10 +595,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "60464",
     "offer_id": 2149214768,
@@ -621,10 +621,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10349",
     "offer_id": 2150358825,
@@ -650,7 +650,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10348",
     "offer_id": 2150358817,
@@ -676,7 +676,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "40725",
     "offer_id": 147084601,
@@ -702,7 +702,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10313",
     "offer_id": 2145527550,
@@ -728,7 +728,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10329",
     "offer_id": 108301200,
@@ -754,7 +754,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10342",
     "offer_id": 2149214678,
@@ -780,7 +780,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10344",
     "offer_id": 2149214674,
@@ -806,7 +806,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "40460",
     "offer_id": 91717843,
@@ -832,7 +832,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "10347",
     "offer_id": 2150185243,
@@ -858,7 +858,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "40524",
     "offer_id": 2146800528,
@@ -884,7 +884,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "75375",
     "offer_id": 317730656,
@@ -907,10 +907,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "11510",
     "offer_id": 2152611238,
@@ -936,7 +936,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "40647",
     "offer_id": 145645824,
@@ -962,7 +962,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "77985",
     "offer_id": 2154335863,
@@ -988,7 +988,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "72046",
     "offer_id": 2151626575,
@@ -1011,10 +1011,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "42207",
     "offer_id": 2149519192,
@@ -1037,10 +1037,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "21278",
     "offer_id": 2150358909,
@@ -1063,10 +1063,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "42177",
     "offer_id": 48295748,
@@ -1089,10 +1089,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "42206",
     "offer_id": 2150185247,
@@ -1115,10 +1115,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "71854",
     "offer_id": 2151885483,
@@ -1141,10 +1141,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "76425",
     "offer_id": 2147161750,
@@ -1167,10 +1167,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "42171",
     "offer_id": 2147161752,
@@ -1193,10 +1193,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "77081",
     "offer_id": 2154335795,
@@ -1222,7 +1222,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "76462",
     "offer_id": 2154335771,
@@ -1248,7 +1248,7 @@
     "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "75441",
     "offer_id": 2151884417,
@@ -1271,10 +1271,10 @@
     "previous_price_gross": null,
     "previous_price_with_code": null,
     "price_changed_now": false,
-    "is_new_product": true
+    "is_new_product": false
   },
   {
-    "checked_at": "2026-06-15T20:33:25.334Z",
+    "checked_at": "2026-06-15T20:44:23.666Z",
     "shop": "Media Expert",
     "lego_code": "75409",
     "offer_id": 2151392247,
